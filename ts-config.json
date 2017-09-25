@@ -1,0 +1,10 @@
+{
+  "files": [
+    "src/scripts/apphub.ts",
+    "src/scripts/user.ts"
+  ],
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "target": "es2015"
+  }
+}
