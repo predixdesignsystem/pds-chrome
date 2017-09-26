@@ -1,306 +1,178 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>{{appname}}</title>
-
-  <!-- Load global AppHub helper scripts -->
-  <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-utilities.js"></script>
-  <!-- -->
-  <script>
-    (function() {
-      var sampleNavObject = {
-        "main": {
-          "items": [
-            {
-              "label": "Dashboard",
-              "icon": "px-fea:dashboard",
-              "path": "/local/#/",
-              "id": "microapp.0",
-              "badge": {
-                "status": "important",
-                "count": 22
-              },
-              "items": [
-                {
-                  "label": "Subnav 1",
-                  "path": "/local/#/subnav1",
-                  "badge": {
-                    "status": "warning",
-                    "count": 3
-                  },
-                  "id": "microapp.0.0"
-                },
-                {
-                  "label": "Subnav 2",
-                  "path": "/local/#/subnav2",
-                  "badge": {
-                    "status": "error",
-                    "count": 2
-                  },
-                  "id": "microapp.0.1"
-                }
-              ]
-            },
-            {
-              "label": "Assets",
-              "icon": "px-fea:asset",
-              "path": "/assets/#/",
-              "badge": {
-                "status": "important",
-                "count": 22
-              },
-              "items": [
-                {
-                  "label": "Subnav 1",
-                  "path": "/assets/#/subnav1",
-                  "badge": {
-                    "status": "warning",
-                    "count": 3
-                  },
-                  "id": "analytics.0.0"
-                },
-                {
-                  "label": "Subnav 2",
-                  "path": "/assets/#/subnav2",
-                  "badge": {
-                    "status": "error",
-                    "count": 2
-                  },
-                  "id": "analytics.0.1"
-                },
-                {
-                  "label": "Open a Modal",
-                  "path": "javascript:window.openMymodal()",
-                  "badge": {
-                    "status": "info",
-                    "count": 1
-                  },
-                  "id": "analytics.0.2"
-                }
-              ],
-              "id": "analytics.0"
-            }
-          ]
-        },
-        "profile": {
-          "items": [
-            {
-              "label": "My Profile",
-              "path": "/local/user/#/",
-              "items": [
-                {
-                  "label": "Profile Detail1",
-                  "path": "/local/user/#/",
-                  "id": "user.0.0"
-                },
-                {
-                  "label": "Your network",
-                  "path": "/local/user/#/network",
-                  "id": "user.0.1"
-                }
-              ],
-              "id": "user.0"
-            }
-          ]
-        },
-        "settings": {
-          "items": [
-            {
-              "label": "Settings",
-              "path": "/local/settings/#/",
-              "items": [
-                {
-                  "label": "settings global",
-                  "path": "/local/settings/#/global",
-                  "id": "settings_sub.0.0"
-                },
-                {
-                  "label": "Help",
-                  "path": "https://www.predix.io/resources",
-                  "id": "settings_sub.0.1"
-                }
-              ],
-              "id": "settings.0"
-            }
-          ]
-        },
-        "user": {
-          "name": "user1",
-          "firstName": "Thomas",
-          "lastName": "Edison",
-          "picture": "/ui-hub-assets/images/avatar.jpg"
-        },
-        "appName": "AppHub Demo Test",
-        "paths": {
-          "microapp": "/local",
-          "analytics": "/assets"
-        },
-        "contextPath": "",
-        "localeData": { "logOut" : 'Cerrar Sesión' }
-
-      };
-      window.nav = sampleNavObject;
-      window.AppHub = new window.AppHubUtil(sampleNavObject);
-
-      /*
-      var navObject = {{{navStr}}};
-      window.nav = navObject;
-      window.AppHub = new window.AppHubUtil(navObject);
-      */
-    })();
-  </script>
-  <!-- Load webcomponentsjs polyfill -->
-  <!-- <script async src="/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js"></script> -->
-  <script defer type="text/javascript">
-  (function() {
-    'use strict';
-    window.WebComponentsReady = false;
-    var onload = function() {
-      window.WebComponentsReady = true;
-      // For native Imports, manually fire WebComponentsReady so user code
-      // can use the same code path for native and polyfill'd imports.
-      if (!window.HTMLImports) {
-        document.dispatchEvent(
-          new CustomEvent('WebComponentsReady', {bubbles: true})
-        );
-      }
-    };
-    var webComponentsSupported = (
-      'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
-    );
-    if (!webComponentsSupported) {
-      var script = document.createElement('script');
-      script.async = true;
-      script.src = '/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js';
-      script.onload = onload;
-      document.head.appendChild(script);
-    } else {
-      onload();
-    }
-  })();
-  </script>
-  <!-- Load Polymer library -->
-  <link defer rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
-  <!-- Load Predix Design System components -->
-  <link defer rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
-  <link defer rel="import" href="/ui-hub-assets/bower_components/px-branding-bar/px-branding-bar.html"/>
-  <link defer rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
-  <!-- Use Predix Design System light theme -->
-  <style is="custom-style" include="px-theme-styles"></style>
-  <!-- Basic page-level styles -->
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-size: 15px;
-    }
-    #__pds-chrome__header {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 999;
-    }
-    #__pds-chrome__container {
-      /*display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      padding-top: 5.333rem;*/
-    }
-    #app-mount {
-      display: block;
-      position: fixed;
-      top: 6rem;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
-</head>
-<body>
-  <div id="__pds-chrome__header">
-    <px-branding-bar application-title="{{appname}}"></px-branding-bar>
-    <px-app-nav></px-app-nav>
-  </div>
-  <div id="__pds-chrome__container">
-    <iframe id="app-mount"></iframe>
-  </div>
-  <!--
-  <script type="text/javascript">
-    window.foo = {{{customThemeOptions.navPosition}}};
-  </script>
-  -->
-  <!-- <script src="/ui-hub-assets/bower_components/pds-chrome/dist/bundle.js"></script> -->
-
-  <template id="app-template">
+{{#if chromeless}}
+  {{!--
+    Loads the actual application, not the shell wrapper. The application
+    rendered here will be loaded inside an iFrame.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    {{!-- Load favico and global theme stylesheets  --}}
+    <link rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
+    <link rel="stylesheet" href="/ui-hub-assets/bower_components/pxh-chrome/dist/css/pxh-chrome.min.css">
+    {{!-- Load global scripts and CSS specified by app --}}
+    {{#each helpers.globalScripts}}
+      <script src="{{this}}"></script>
+    {{/each}}
+    {{#each helpers.globalCSS}}
+      <link rel="stylesheet" href="{{this}}"/>
+    {{/each}}
+  </head>
+  <body>
     {{{body}}}
-  </template>
-
-  <script>
-    (function(){
-      function initApp() {
-        initNav();
-        initAppBody();
-      };
-
-      function initNav() {
-        var appNavElement = document.querySelector('px-app-nav');
-        /* Set the initial keys and items */
-        appNavElement.keys = {
-          id: 'id',
-          label: 'label',
-          children: 'items',
-          icon: 'icon'
-        };
-        appNavElement.items = AppHub.Nav.getItems();
-        /**
-         * When the user changes the page, call the AppHub helpers to update
-         * the application state
-         */
-        appNavElement.addEventListener('selected-changed', function(e) {
-          AppHub.Nav.navigateToItemPath(e.detail.value);
-        });
-        /**
-         * If there is is an initial window path select the corresponding
-         * navigation item
-         */
-        if (window.location.pathname !== "") {
-          var microAppPath = AppHub.Nav.getFullMicroAppPath();
-          var navItem = AppHub.Nav.findNavItemByPath(microAppPath);
-          if (navItem !== null) {
-            appNavElement.selected = navItem;
-          }
+  </body>
+  </html>
+{{else}}
+  {{!--
+    Loads a bit of "chrome" that surrounds the application iFrame, including
+    the navigation, branding bar, and notifications tray.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    {{!-- Load newrelicHeader provided by back-end --}}
+    {{{newrelicHeader}}}
+    {{!-- Load webcomponentsjs polyfill if needed --}}
+    <script defer type="text/javascript">
+    (function() {
+      'use strict';
+      window.WebComponentsReady = false;
+      var onload = function() {
+        window.WebComponentsReady = true;
+        // For native Imports, manually fire WebComponentsReady so user code
+        // can use the same code path for native and polyfill'd imports.
+        if (!window.HTMLImports) {
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
         }
       };
-
-      function initAppBody() {
-        var template = document.getElementById('app-template');
-        var mount = document.getElementById('app-mount');
-        console.log(mount);
-        var doc = mount.contentWindow.document;
-        doc.open();
-        doc.write(template.innerHTML);
-        /* Inject global nav and AppHub instances into iFrame window */
-        mount.contentWindow.nav = window.nav;
-        mount.contentWindow.AppHub = window.AppHub;
-      };
-
-      if (window.WebComponentsReady) {
-        initApp();
+      var webComponentsSupported = (
+        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+      );
+      if (!webComponentsSupported) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
       } else {
-        window.addEventListener('WebComponentsReady', initApp.bind(this));
+        onload();
       }
     })();
-  </script>
-</body>
-</html>
+    </script>
+    {{!-- Load Polymer library --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
+    {{!-- Load Predix Design System components --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-branding-bar/px-branding-bar.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
+    {{!-- Use Predix Design System light theme --}}
+    <style is="custom-style" include="px-theme-styles"></style>
+    {{!-- Set basic theme chrome styles --}}
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-size: 15px;
+      }
+      #header {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+      }
+      #app {
+        display: block;
+        position: fixed;
+        top: 6rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <px-branding-bar application-title="{{appname}}"></px-branding-bar>
+      <px-app-nav></px-app-nav>
+    </div>
+    <div id="app-container">
+      <iframe id="app"></iframe>
+    </div>
+    {{!-- Load Predix Design System chrome utilities --}}
+    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-utilities.js"></script>
+    <script>
+      (function() {
+        'use strict';
+        var navObject = {{{navStr}}};
+        window.nav = navObject;
+        window.AppHub = new window.AppHubUtil(navObject);
+
+        function initApp() {
+          initAppFrame();
+          initNav();
+        };
+
+        function initAppFrame() {
+          var frame = document.getElementById('app');
+          var microAppPath = AppHub.Nav.getFullMicroAppPath();
+          frame.src = AppHub.Nav.addQueryToPath(microAppPath, '?chromeless=true');
+          /* Detect app navigation events */
+          frame.onload = function() {
+            console.log('%s was loaded in the iFrame', frame.src);
+          };
+        };
+
+        function initNav() {
+          var appNavElement = document.querySelector('px-app-nav');
+          /* Set the initial keys and items */
+          appNavElement.keys = {
+            id: 'id',
+            label: 'label',
+            children: 'items',
+            icon: 'icon'
+          };
+          appNavElement.items = AppHub.Nav.getItems();
+          /**
+           * When the user changes the page, call the AppHub helpers to update
+           * the application state
+           */
+          appNavElement.addEventListener('selected-changed', function(e) {
+            AppHub.Nav.navigateToItemPath(e.detail.value);
+          });
+          /**
+           * If there is is an initial window path select the corresponding
+           * navigation item
+           */
+          if (window.location.pathname !== "") {
+            var microAppPath = AppHub.Nav.getFullMicroAppPath();
+            var navItem = AppHub.Nav.findNavItemByPath(microAppPath);
+            if (navItem !== null) {
+              appNavElement.selected = navItem;
+            }
+          }
+        };
+
+        if (window.WebComponentsReady) {
+          initApp();
+        } else {
+          window.addEventListener('WebComponentsReady', initApp.bind(this));
+        }
+      })();
+    </script>
+  </body>
+  </html>
+{{/if}}

@@ -47,7 +47,7 @@
     }
     if (window.location.search !== "") {
       /* Add existing query params to new path */
-      newPath = buildUrl(newPath, window.location.search);
+      newPath = addQueryToPath(newPath, window.location.search);
     }
     /* Push the new URL */
     history.pushState(null, null, newPath);
@@ -145,6 +145,8 @@
     };
   };
 
+  NavUtil.prototype.addQueryToPath = addQueryToPath;
+
   function findMicroAppInPath(path, microApps) {
     /* Transform apps object into an array of [microAppPath, microAppId] */
     var microAppPaths = Object.keys(microApps).map(function(appName) {
@@ -166,7 +168,7 @@
     };
   };
 
-  function buildUrl(pathWithHash, query) {
+  function addQueryToPath(pathWithHash, query) {
     var path;
     var hash;
     if (pathWithHash.indexOf('#') > -1) {
@@ -179,6 +181,21 @@
     }
     return path + (query || "") + '#' + hash;
   };
+
+  // function parsePath(pathname) {
+  //   var path;
+  //   var hash;
+  //   var query;
+  //   if (path.indexOf('#') > -1) {
+  //     var parts = pathname.split('#');
+  //     path = parts[0];
+  //     hash = parts[1];
+  //   }
+  //   else {
+  //     path = pathname;
+  //     hash = '';
+  //   }
+  // };
 })();
 
 
