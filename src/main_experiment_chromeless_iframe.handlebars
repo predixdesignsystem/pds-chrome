@@ -1,0 +1,198 @@
+{{#if chromeless}}
+  {{!--
+    Loads the actual application, not the shell wrapper. The application
+    rendered here will be loaded inside an iFrame.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    {{!-- Load favico and global theme stylesheets  --}}
+    <link rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
+    <link rel="stylesheet" href="/ui-hub-assets/bower_components/pxh-chrome/dist/css/pxh-chrome.min.css">
+    {{!-- Load global scripts and CSS specified by app --}}
+    {{#each helpers.globalScripts}}
+      <script src="{{this}}"></script>
+    {{/each}}
+    {{#each helpers.globalCSS}}
+      <link rel="stylesheet" href="{{this}}"/>
+    {{/each}}
+  </head>
+  <body>
+    {{{body}}}
+  </body>
+  </html>
+{{else}}
+  {{!--
+    Loads a bit of "chrome" that surrounds the application iFrame, including
+    the navigation, branding bar, and notifications tray.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    {{!-- Load newrelicHeader provided by back-end --}}
+    {{{newrelicHeader}}}
+    {{!-- Load webcomponentsjs polyfill if needed --}}
+    <script defer type="text/javascript">
+    (function() {
+      'use strict';
+      window.WebComponentsReady = false;
+      var onload = function() {
+        window.WebComponentsReady = true;
+        // For native Imports, manually fire WebComponentsReady so user code
+        // can use the same code path for native and polyfill'd imports.
+        if (!window.HTMLImports) {
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
+        }
+      };
+      var webComponentsSupported = (
+        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+      );
+      if (!webComponentsSupported) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
+      } else {
+        onload();
+      }
+    })();
+    </script>
+    {{!-- Load Polymer library --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
+    {{!-- Load Predix Design System components --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-branding-bar/px-branding-bar.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
+    {{!-- Load pds-chrome local components --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/pds-chrome/src/elements/pds-chrome-user-profile.html"/>
+    {{!-- Use Predix Design System light theme --}}
+    <style is="custom-style" include="px-theme-styles"></style>
+    {{!-- Set basic theme chrome styles --}}
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-size: 15px;
+      }
+      #header {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+      }
+      #app {
+        display: block;
+        position: fixed;
+        top: 6rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <px-branding-bar id="branding-bar" application-title="{{appname}}"></px-branding-bar>
+      <px-app-nav id="app-nav">
+        <pds-chrome-user-profile id="user-profile" slot="actions"
+            name="David Leonard"
+            img-url="/ui-hub-assets/bower_components/pds-chrome/test/img/profile-picture.jpg"
+            profile-links='[
+              {"label":"Edit profile", "path":"/user/#/profile"},
+              {"label":"Logout", "path":"/logout"}
+            ]'
+            settings-links='[
+              {"label":"Preferences", "path":"/settings/#/preferences"},
+              {"label":"Manage team", "path":"/settings/#/team"}
+            ]'>
+        </pds-chrome-user-profile>
+      </px-app-nav>
+    </div>
+    <div id="app-container">
+      <iframe id="app"></iframe>
+    </div>
+    {{!-- Load Predix Design System chrome utilities --}}
+    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-utilities.js"></script>
+    <script>
+      (function() {
+        'use strict';
+        var navObject = {{{navStr}}};
+        window.nav = navObject;
+        window.AppHub = new window.AppHubUtil(navObject);
+
+        function initApp() {
+          initAppFrame();
+          initAppNav();
+          initUserProfile();
+        };
+
+        function initAppFrame() {
+          var frame = document.getElementById('app');
+          var microAppPath = AppHub.Nav.getFullMicroAppPath();
+          frame.src = AppHub.Nav.addQueryToPath(microAppPath, '?chromeless=true');
+          /* Detect app navigation events */
+          frame.onload = function() {
+            console.log('%s was loaded in the iFrame', frame.src);
+          };
+        };
+
+        function initAppNav() {
+          var appNavElement = document.getElementById('app-nav');
+          /* Set the initial keys and items */
+          appNavElement.keys = {
+            id: 'id',
+            label: 'label',
+            children: 'items',
+            icon: 'icon'
+          };
+          appNavElement.items = AppHub.Nav.getItems();
+          /**
+           * When the user changes the page, call the AppHub helpers to update
+           * the application state
+           */
+          appNavElement.addEventListener('selected-changed', function(e) {
+            AppHub.Nav.navigateToItemPath(e.detail.value);
+          });
+          /**
+           * If there is is an initial window path select the corresponding
+           * navigation item
+           */
+          if (window.location.pathname !== "") {
+            var microAppPath = AppHub.Nav.getFullMicroAppPath();
+            var navItem = AppHub.Nav.findNavItemByPath(microAppPath);
+            if (navItem !== null) {
+              appNavElement.selected = navItem;
+            }
+          }
+        };
+
+        function initUserProfile() {
+
+        };
+
+        if (window.WebComponentsReady) {
+          initApp();
+        } else {
+          window.addEventListener('WebComponentsReady', initApp.bind(this));
+        }
+      })();
+    </script>
+  </body>
+  </html>
+{{/if}}

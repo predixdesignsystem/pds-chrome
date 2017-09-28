@@ -20,5 +20,9 @@
     "px-app-nav": "^2.0.0",
     "px-branding-bar": "^1.0.0",
     "px-theme": "^3.0.0"
+  },
+  "devDependencies": {
+    "px-colors-design": "^1.0.4",
+    "px-defaults-design": "^2.0.2"
   }
 }

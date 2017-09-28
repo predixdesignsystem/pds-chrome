@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>App Navigation</title>
+    <!-- Load webcomponentsjs polyfill if needed -->
+    <script defer type="text/javascript">
+    (function() {
+      'use strict';
+      window.WebComponentsReady = false;
+      var onload = function() {
+        window.WebComponentsReady = true;
+        // For native Imports, manually fire WebComponentsReady so user code
+        // can use the same code path for native and polyfill'd imports.
+        if (!window.HTMLImports) {
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
+        }
+      };
+      var webComponentsSupported = (
+        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+      );
+      if (!webComponentsSupported) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
+      } else {
+        onload();
+      }
+    })();
+    </script>
+    <!-- Load Polymer library -->
+    <link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
+    <!-- Load Predix Design System components -->
+    <link rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
+    <!-- Load local components -->
+    <link rel="import" href="/ui-hub-assets/bower_components/pds-chrome/src/elements/pds-chrome-user-profile.html"/>
+    <!-- Use Predix Design System light theme -->
+    <style is="custom-style" include="px-theme-styles"></style>
+    <!-- Define basic styles -->
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-size: 15px;
+        background-color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <px-app-nav id="app-nav" keys='{"id":"id", "label":"label", "children":"items", "icon":"icon"}'></px-app-nav>
+    </div>
+    <script>
+      (function() {
+        'use strict';
+
+        var appNavEl = document.getElementById('app-nav');
+
+        appNavEl.addEventListener('px-app-nav-group-will-open', function(evt) {
+          var parentEvt = new CustomEvent('app-hub-nav-opening', {});
+          window.parent.dispatchEvent(parentEvt);
+        });
+
+        appNavEl.addEventListener('px-app-nav-group-will-close', function(evt) {
+          var parentEvt = new CustomEvent('app-hub-nav-closing', {});
+          window.parent.dispatchEvent(parentEvt);
+        });
+
+        /**
+         * Utility class for updating the navigation.
+         * @class NavUtil
+         * @constructor
+         * @param {object} options
+         * @param {array}  options.items         A list of navigation items
+         * @param {string} options.contextPath   Base path all microapps are served under
+         * @param {array}  options.microAppPaths List of microapp base paths
+         */
+        window.NavUtil = function(options) {
+          this._appNavEl = appNavEl;
+          this._items = (options.items || []);
+          this._contextPath = (options.contextPath || '');
+          this._microAppPaths = (options.microAppPaths || []);
+          /* Set the initial items in the app nav */
+          this._appNavEl.items = this._items;
+          return this;
+        };
+
+        window.NavUtil.prototype.setItems = function(items) {
+          this._items = items;
+          this._appNavEl.items = items;
+        };
+
+        function polyfillCustomEvent() {
+          if ( typeof window.CustomEvent === "function" ) return false;
+
+          function CustomEvent ( event, params ) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent( 'CustomEvent' );
+            evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+            return evt;
+           }
+
+          CustomEvent.prototype = window.Event.prototype;
+          window.CustomEvent = CustomEvent;
+        }
+
+        polyfillCustomEvent();
+      })();
+    </script>
+  </body>
+</html>

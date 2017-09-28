@@ -1,0 +1,160 @@
+// ------- Namespace to prefix CSS classes -------
+$pds-namespace: '__pds-chrome__';
+$pds-font-family : "GE Inspira Sans", sans-serif !default;
+$pds-app-nav-height: 60px;
+$pds-branding-bar-height: 2rem;
+
+// ------- Helpers -------
+@import "px-defaults-design/_settings.defaults.scss";
+@import "px-colors-design/_settings.colors.scss";
+
+// ------- App styles -------
+
+// Document-level styles
+html, body {
+  margin: 0;
+  padding: 0;
+  font-size: 15px;
+  overflow: hidden;
+}
+
+// COMPONENT: HEADER
+
+.#{$pds-namespace}header {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+.#{$pds-namespace}header--no-branding-bar {}
+
+// COMPONENT: BRANDING-BAR
+
+.#{$pds-namespace}branding-bar {
+  /* mini-normalize */
+  box-sizing: border-box;
+  text-size-adjust: 100%; /* [3] */
+  -moz-osx-font-smoothing: grayscale; /* [4] */
+  -webkit-font-smoothing: antialiased; /* [4] */
+  line-height: $inuit-base-line-height / $inuit-base-font-size;
+  font-family: $pds-font-family;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0 1rem;
+  height: $pds-branding-bar-height;
+  font-size: 1rem;
+  background-color: $gray17;
+  color: $gray8;
+}
+
+.#{$pds-namespace}branding-bar__powered-by {
+  font-size: 0.8rem;
+}
+
+.#{$pds-namespace}branding-bar__app {
+  display: flex;
+}
+
+.#{$pds-namespace}branding-bar__app__ge-logo {
+  fill: $gray8;
+  display: block;
+  margin-right: .33rem;
+}
+
+.#{$pds-namespace}branding-bar__powered-by {
+  display: flex;
+  align-items: center;
+}
+
+.#{$pds-namespace}branding-bar__powered-by__text {
+  position: relative;
+  top: .15rem;
+}
+
+.#{$pds-namespace}branding-bar__powered-by__predix-logo {
+  display: block;
+  max-width: 4rem;
+  vertical-align: middle;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 0;
+  margin-left: .33rem;
+}
+
+.#{$pds-namespace}branding-bar__powered-by__cls-1 {
+  fill: #2886af;
+}
+
+.#{$pds-namespace}branding-bar__powered-by__cls-2 {
+  fill: #3ab4d4;
+}
+
+// COMPONENT: APP-NAV
+
+.#{$pds-namespace}app-nav {
+  position: absolute;
+  top: 2rem;
+  display: block;
+  width: 100%;
+  height: 60px;
+}
+
+.#{$pds-namespace}app-nav__frame {
+  display: block;
+  width: 100%;
+  height: 60px;
+  border: none;
+  background-color: transparent;
+  box-shadow: 0 2px 4px rgba(0,0,0,.2);
+  transition: background-color 0.25s;
+}
+
+.#{$pds-namespace}app-nav__frame--loading {
+  background-color: $gray2; /* app-nav background (light theme) */
+}
+
+.#{$pds-namespace}app-nav__frame--opened {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.3);
+}
+
+.#{$pds-namespace}app--horizontal .#{$pds-namespace}app-nav__frame--opened {
+  top: 2rem; /* Offset for branding bar */
+}
+
+// COMPONENT: BODY
+
+.#{$pds-namespace}body {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.#{$pds-namespace}header + .#{$pds-namespace}body {
+  top: calc(2rem + 60px);
+}
+
+.#{$pds-namespace}header--no-branding-bar + .#{$pds-namespace}body {
+  top: $pds-app-nav-height;
+}

@@ -1,0 +1,79 @@
+<dom-module id="pds-chrome-user-profile">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        height: 100%;
+        align-items: center;
+        padding-right: 1rem;
+        user-select: none;
+      }
+      .profile {
+        display: flex;
+        flex: 1 1 auto;
+        flex-direction: row;
+      }
+      .profile__picture {
+        display: block;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 100%;
+        overflow: hidden;
+        margin-right: 0.5rem;
+      }
+      .profile__picture__img {
+        max-width: 100%;
+      }
+      .profile__name {
+        line-height: 0;
+        color: var(--pds-chrome-user-profile-name-color, var(--px-app-nav-item-text-color, black))
+      }
+    </style>
+    <div class="profile">
+      <!-- Shows profile photo if provided -->
+      <template is="dom-if" if="[[imgUrl]]">
+        <div class="profile__picture">
+          <img class="profile__picture__img" src$="[[imgUrl]]" alt$="Profile picture for [[name]]"/>
+        </div>
+      </template>
+      <!-- Shows name (not linked to anything) if no profile links provided -->
+      <template is="dom-if" if="[[!profileLinks]]">
+        <p class="profile__name">[[name]]</p>
+      </template>
+      <!-- Shows name as a dropdown trigger if profile links provided -->
+      <template is="dom-if" if="[[profileLinks]]">
+        <px-dropdown
+            items="[[_convertLinksToItems(profileLinks)]]"
+            button-style="bare"
+            display-value="[[name]]">
+        </px-dropdown>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'pds-chrome-user-profile',
+      properties: {
+        /** Full name for the user */
+        name: {
+          type: String
+        },
+        /** (Optional) Path to an optional profile image */
+        imgUrl: {
+          type: String,
+          value: null
+        },
+        /** (Optional) List of links placed in a dropdown menu next to the user's name */
+        profileLinks: {
+          type: Array,
+          value: null
+        },
+        /** (Optional) List of links placed in a dropdown opened with a settings icon */
+        settingsLinks: {
+          type: Array,
+          value: null
+        }
+      }
+    })
+  </script>
+</dom-module>
