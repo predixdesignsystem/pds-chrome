@@ -64,6 +64,7 @@ const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const cssmin = require('gulp-cssmin');
 const importOnce = require('node-sass-import-once');
+const umd = require('umd');
 
 /**
  * TASK: SASS
@@ -97,6 +98,28 @@ gulp.task('sass:build', function() {
 });
 
 gulp.task('sass', ['sass:clean', 'sass:build']);
+
+/**
+ * TASK: JS
+ * Builds chrome JavaScript files into UMD modules.
+ */
+
+gulp.task('js:clean', function() {
+  return del(['./dist/scripts/**/*']);
+});
+
+gulp.task('js:build', function() {
+  return gulp.src(['./src/scripts/service.js'])
+    .pipe(umd({
+      templateName: 'returnExportsGlobal',
+      namespace: function(file) {
+        return 'AppHub.Service';
+      }
+    }))
+    .pipe(gulp.dest('./dist/scripts'))
+});
+
+gulp.task('js', ['js:clean', 'js:build']);
 
 /**
  * TASK: WATCH

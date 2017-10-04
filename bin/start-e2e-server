@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+
+const e2eServer = require('../test/e2e-server/server.js')();
+e2eServer.start(3030);

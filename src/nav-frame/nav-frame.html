@@ -63,39 +63,44 @@
 
         var appNavEl = document.getElementById('app-nav');
 
+        /**
+         * Sets the app-nav items.
+         *
+         * @param {array} items
+         */
+        window.setNavItems = function setNavItems(items) {
+          appNavEl.items = items;
+        };
+
+        /**
+         * Selects a new app-nav item, useful for changing the visual state of
+         * app-nav when the URL is changed.
+         *
+         * @param {object} item Reference to one of the app-nav items
+         */
+        window.setSelectedNavItem = function setSelectedNavItem(item) {
+          appNavEl.selected = item;
+        };
+
+        /* Send events to parent window when the nav will open or close */
         appNavEl.addEventListener('px-app-nav-group-will-open', function(evt) {
           var parentEvt = new CustomEvent('app-hub-nav-opening', {});
           window.parent.dispatchEvent(parentEvt);
         });
-
         appNavEl.addEventListener('px-app-nav-group-will-close', function(evt) {
           var parentEvt = new CustomEvent('app-hub-nav-closing', {});
           window.parent.dispatchEvent(parentEvt);
         });
 
-        /**
-         * Utility class for updating the navigation.
-         * @class NavUtil
-         * @constructor
-         * @param {object} options
-         * @param {array}  options.items         A list of navigation items
-         * @param {string} options.contextPath   Base path all microapps are served under
-         * @param {array}  options.microAppPaths List of microapp base paths
-         */
-        window.NavUtil = function(options) {
-          this._appNavEl = appNavEl;
-          this._items = (options.items || []);
-          this._contextPath = (options.contextPath || '');
-          this._microAppPaths = (options.microAppPaths || []);
-          /* Set the initial items in the app nav */
-          this._appNavEl.items = this._items;
-          return this;
-        };
-
-        window.NavUtil.prototype.setItems = function(items) {
-          this._items = items;
-          this._appNavEl.items = items;
-        };
+        /* Send events to the parent window when a nav item is selected */
+        appNavEl.addEventListener('selected-changed', function(evt) {
+          var parentEvt = new CustomEvent('app-hub-nav-item-selected', {
+            detail: {
+              value: evt.detail.value
+            }
+          });
+          window.parent.dispatchEvent(parentEvt);
+        });
 
         function polyfillCustomEvent() {
           if ( typeof window.CustomEvent === "function" ) return false;

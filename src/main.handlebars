@@ -1,30 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-  <!-- ui-app-hub build version: ##BUILDVERSION##  (DO NOT DELETE THIS BLOCK) -->
+{{#if chromeless}}
+  {{!--
+    Loads the actual application, not the shell wrapper. The application
+    rendered here will be loaded inside an iFrame.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{appname}}</title>
-    {{!-- Inject New Relic header provided by back-end --}}
-    {{{newrelicHeader}}}
-    {{!-- Inject global nav object --}}
-    <script>
-      (function() {
-        window.nav = {{{navStr}}};
-      })();
-    </script>
-    {{!-- Inject pxh-chrome css (temporary) --}}
-    <link rel="stylesheet" href="/ui-hub-assets/bower_components/pxh-chrome/dist/css/pxh-chrome.min.css"/>
-    {{!-- Local overrides for pxh-chrome css (temporary) --}}
-    <style>
-      .pxh-view-header {
-        position: absolute;
-      }
-    </style>
-    {{!-- Inject pds-chrome-styles --}}
-    <link rel="stylesheet" href="/ui-hub-assets/bower_components/pds-chrome/dist/css/pds-chrome-styles.css"/>
-    {{!-- Inject global scripts and CSS files --}}
+    {{!-- Load favico and global theme stylesheets  --}}
+    <link rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
+    <link rel="stylesheet" href="/ui-hub-assets/bower_components/pxh-chrome/dist/css/pxh-chrome.min.css">
+    {{!-- Load global scripts and CSS specified by app --}}
     {{#each helpers.globalScripts}}
       <script src="{{this}}"></script>
     {{/each}}
@@ -32,152 +21,300 @@
       <link rel="stylesheet" href="{{this}}"/>
     {{/each}}
   </head>
-  {{#if chromeless}}
-    <body>
-      {{{body}}}
-    </body>
-  {{else}}
-    <body {{#if customThemeOptions.nav.position}}class="__pds-chrome__app--{{customThemeOptions.nav.position}}"{{else}}class="__pds-chrome__app--horizontal"{{/if}}>
-      {{!-- header --}}
-      <div class="__pds-chrome__header {{#if customThemeOptions.brandingBar.disabled}}__pds-chrome__header--no-branding-bar{{/if}}">
-        {{!-- header > branding-bar --}}
-        {{#if customThemeOptions.brandingBar.disabled}}
-        {{else}}
-          <div class="__pds-chrome__branding-bar">
-            <div class="__pds-chrome__branding-bar__app">
-              {{#if customThemeOptions.brandingBar.hideGELogo}}
-              {{else}}
-                <svg class="__pds-chrome__branding-bar__app__ge-logo" xmlns="http://www.w3.org/2000/svg" x="0" y="0" width="20" height="20" viewBox="-280 372 50 50">
-                  <path d="M-255 422c-13.8 0-25-11.1-25-25 0-13.8 11.2-25 25-25s25 11.2 25 25C-230 410.9-241.2 422-255 422zM-255 373.2c-13.1 0-23.8 10.7-23.8 23.8s10.7 23.8 23.8 23.8 23.8-10.7 23.8-23.8S-241.8 373.2-255 373.2zM-233.8 404.1c0 0 0 0-0.1 0s-0.1 0-0.1-0.1c0 0 0.8-2.5 0.8-5.3 0-3-1.3-4.9-2.8-4.9 -1 0-1.7 0.7-1.7 1.7 0 1.9 2.3 2 2.3 6.1 0 1.7-0.4 3.3-0.9 5 -2.6 8.7-10.7 12.7-18.7 12.7 -3.7 0-6.3-0.8-7.1-1.1v-0.1l0.1-0.1c0.3 0.1 2.5 0.8 5.3 0.8 3 0 4.8-1.3 4.8-2.8 0-1-0.8-1.7-1.7-1.7 -1.9 0-2 2.4-6 2.4 -1.7 0-3.3-0.4-5.1-0.9 -8.6-2.6-12.7-10.7-12.7-18.8 0-3.9 1.1-7 1.1-7.1h0.1c0.1 0 0.1 0.1 0.1 0.1 -0.1 0.3-0.8 2.5-0.8 5.3 0 3 1.3 4.8 2.8 4.8 0.9 0 1.7-0.7 1.7-1.7 0-1.9-2.3-2.1-2.3-6.1 0-1.7 0.4-3.3 0.9-5.1 2.6-8.6 10.7-12.6 18.7-12.7 3.7 0 6.9 1.1 7.1 1.2v0.1c0 0.1-0.1 0.1-0.1 0.1s-2.1-0.9-5.3-0.9c-3 0-4.8 1.3-4.8 2.8 0 0.9 0.7 1.7 1.7 1.7 1.9 0 2-2.3 6-2.3 1.7 0 3.3 0.4 5.1 0.9 8.7 2.6 12.6 10.8 12.7 18.7C-232.6 401-233.8 404.1-233.8 404.1zM-245.7 398.2c-2.4 0-4.2 1.7-4.2 3.8 0 1.7 1 3.1 2.4 3.1 0.5 0 1-0.3 1-0.9 0-0.9-1.2-1.1-1.1-2.5 0-0.9 0.9-1.5 1.7-1.5 1.7 0 2.4 1.6 2.4 3.3 -0.1 2.6-2 4.3-4.2 4.3 -2.9 0-4.8-2.8-4.8-5.8 0-4.4 2.9-6.2 4.4-6.6 0 0 4 0.7 3.8-1 0-0.8-1.2-1.1-2-1.1 -0.9 0-1.8 0.3-1.8 0.3 -0.5-0.2-0.8-0.7-1-1.3 2.8-2.1 4.8-4.2 4.8-6.6 0-1.3-0.8-2.4-2.4-2.4 -2.8 0-5 3.6-5 6.8 0 0.5 0 1.1 0.1 1.6 -1.8 1.3-3.1 2.1-5.6 3.6 0-0.3 0.1-1.1 0.3-2.1 0.8-0.9 2-2.2 2-3.3 0-0.5-0.3-0.9-0.8-0.9 -1.4 0-2.4 2.1-2.7 3.5 -0.6 0.8-1.9 1.7-2.9 1.7 -0.8 0-1.1-0.8-1.2-1 2.6-0.9 5.9-4.5 5.9-7.8 0-0.7-0.3-2.2-2.4-2.2 -3.1 0-5.7 4.7-5.7 8.2 -1.1 0-1.5-1.2-1.5-2.1s0.4-1.8 0.4-2.1c0-0.3-0.1-0.6-0.5-0.6 -1 0-1.7 1.4-1.7 3 0.1 2.2 1.5 3.6 3.5 3.7 0.3 1.3 1.5 2.5 2.9 2.5 0.9 0 2-0.3 2.8-1 -0.1 0.5-0.1 0.9-0.2 1.3 -3 1.6-5.3 2.7-7.3 4.5 -1.6 1.5-2.5 3.4-2.5 4.9 0 2.1 1.3 4 4 4 3.2 0 5.6-2.5 6.8-6.1 0.6-1.7 0.8-4.1 0.9-6.3 3.2-1.8 4.7-2.8 6.4-4 0.2 0.4 0.4 0.6 0.7 0.8 -1.5 0.8-4.9 2.9-4.9 8 0 3.6 2.4 7.6 7.2 7.6 3.9 0 6.7-3.3 6.7-6.4C-241 400.8-242.6 398.2-245.7 398.2zM-264.7 407.9c-1 0-1.7-0.6-1.7-1.7 0-3 4.1-5.8 7.2-7.3C-259.8 403-261.2 407.7-264.7 407.9zM-262.4 391.5c0-2.3 2.3-6.6 3.6-6.2C-257.2 385.9-260.2 390.3-262.4 391.5zM-249.4 390.5c0-2.8 1.9-5.6 3-5.1C-245.2 386-247.3 388.7-249.4 390.5z"></path>
-                </svg>
-              {{/if}}
-              <span>{{appname}}</span>
-            </div>
-            {{#if customThemeOptions.brandingBar.hidePoweredByPredix}}
-            {{else}}
-              <div class="__pds-chrome__branding-bar__powered-by">
-                <span class="__pds-chrome__branding-bar__powered-by__text">Powered by</span>
-                <svg class="__pds-chrome__branding-bar__powered-by__predix-logo" xmlns="http://www.w3.org/2000/svg" height="13" viewBox="0 0 82.13 13.24">
-                  <polygon class="__pds-chrome__branding-bar__powered-by__cls-1" points="31.08 0 31.08 13.24 42.44 13.24 42.44 10.88 33.92 10.88 33.92 7.79 41.02 7.79 41.02 5.43 33.92 5.43 33.92 2.37 42.44 2.37 42.44 0 31.08 0"/>
-                  <path class="__pds-chrome__branding-bar__powered-by__cls-1" d="M49.3,10.84h2.17a4.93,4.93,0,0,0,3.64-1.32,4.12,4.12,0,0,0,1.11-3c-0.06-2-1.34-4.12-4.75-4.12H49.3v8.48Zm-2.84,2.4V0h5a8,8,0,0,1,5.72,2,6.4,6.4,0,0,1,1.87,4.48,6.35,6.35,0,0,1-1.78,4.62,7.91,7.91,0,0,1-5.81,2.11h-5Z"/>
-                  <polygon class="__pds-chrome__branding-bar__powered-by__cls-1" points="62.57 13.24 65.41 13.24 65.41 0 62.57 0 62.57 6.57 62.57 13.24"/>
-                  <path class="__pds-chrome__branding-bar__powered-by__cls-1" d="M6.2,0H0V13.24H2.86V9.09H6.2c3.83,0,5.57-2.41,5.57-4.67S10,0,6.2,0Zm0,6.72H2.86V2.37H6.2c1.88,0,2.74.92,2.74,2.05S8.08,6.72,6.2,6.72Z"/>
-                  <path class="__pds-chrome__branding-bar__powered-by__cls-1" d="M27.09,13.24L23.56,8.81a4.57,4.57,0,0,0,3.5-4.39C27.06,2.16,25.32,0,21.49,0h-6.2V13.24h2.86V9.09H20.6l3.16,4.16h3.33ZM18.15,2.37h3.34c1.88,0,2.74.92,2.74,2.05s-0.86,2.3-2.74,2.3H18.15V2.37Z"/>
-                  <polygon class="__pds-chrome__branding-bar__powered-by__cls-1" points="77.38 6.14 82.13 0 78.79 0 75.34 4.56 71.9 0 68.57 0 73.31 6.14 77.38 6.14"/>
-                  <polygon class="__pds-chrome__branding-bar__powered-by__cls-2" points="73.31 7.08 68.55 13.24 71.88 13.24 75.34 8.67 78.8 13.24 82.13 13.24 77.37 7.08 73.31 7.08"/>
-                </svg>
-              </div>
-            {{/if}}
-          </div>
-        {{/if}}
-        {{!-- header > navigation --}}
-        <div class="__pds-chrome__app-nav">
-          <iframe id="__pds-chrome-app-nav-frame__" class="__pds-chrome__app-nav__frame __pds-chrome__app-nav__frame--loading" allowtransparency="true"></iframe>
-        </div>
-      </div>
-      {{!-- body --}}
-      <div class="__pds-chrome__body">
-        {{{body}}}
-      </div>
-      {{!-- notifications --}}
-      <div class="__pds-chrome__notifications">
-        <!-- ... -->
-      </div>
-    </body>
-
-    {{!-- Define scripts for pds-chrome --}}
+  <body>
+    {{{body}}}
+  </body>
+  </html>
+{{else}}
+  {{!--
+    Loads a bit of "chrome" that surrounds the application iFrame, including
+    the navigation, branding bar, and notifications tray.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    {{!-- Load newrelicHeader provided by back-end --}}
+    {{{newrelicHeader}}}
+    {{!-- Load webcomponentsjs polyfill if needed --}}
+    <script defer type="text/javascript">
+    (function() {
+      'use strict';
+      window.WebComponentsReady = false;
+      var onload = function() {
+        window.WebComponentsReady = true;
+        // For native Imports, manually fire WebComponentsReady so user code
+        // can use the same code path for native and polyfill'd imports.
+        if (!window.HTMLImports) {
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
+        }
+      };
+      var webComponentsSupported = (
+        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+      );
+      if (!webComponentsSupported) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
+      } else {
+        onload();
+      }
+    })();
+    </script>
+    {{!-- Load Polymer library --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
+    {{!-- Load Predix Design System components --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-branding-bar/px-branding-bar.html"/>
+    <link rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
+    {{!-- Load pds-chrome local components --}}
+    <link rel="import" href="/ui-hub-assets/bower_components/pds-chrome/src/elements/pds-chrome-user-profile.html"/>
+    {{!-- Use Predix Design System light theme --}}
+    <style is="custom-style" include="px-theme-styles"></style>
+    {{!-- Set basic theme chrome styles --}}
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-size: 15px;
+      }
+      #header {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+      }
+      #app {
+        display: block;
+        position: fixed;
+        top: 6rem;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="header">
+      <px-branding-bar id="branding-bar" application-title="{{appname}}"></px-branding-bar>
+      <px-app-nav id="app-nav">
+        <pds-chrome-user-profile id="user-profile" slot="actions"
+            name="David Leonard"
+            img-url="/ui-hub-assets/bower_components/pds-chrome/test/img/profile-picture.jpg"
+            profile-links='[
+              {"label":"Edit profile", "path":"/user/#/profile"},
+              {"label":"Logout", "path":"/logout"}
+            ]'
+            settings-links='[
+              {"label":"Preferences", "path":"/settings/#/preferences"},
+              {"label":"Manage team", "path":"/settings/#/team"}
+            ]'>
+        </pds-chrome-user-profile>
+      </px-app-nav>
+    </div>
+    <div id="app-container">
+      <iframe id="app"></iframe>
+    </div>
+    {{!-- Load Predix Design System chrome utilities --}}
+    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/app-hub-utilities.js"></script>
+    <!-- <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-utilities.js"></script> -->
     <script>
       (function() {
-        var frameEl = document.getElementById('__pds-chrome-app-nav-frame__');
-        frameEl.onload = function() {
-          frameEl.classList.remove('__pds-chrome__app-nav__frame--loading');
-          initAppNavFrame(frameEl);
-        };
-        frameEl.src = "/ui-hub-assets/bower_components/pds-chrome/src/nav-frame/nav-frame.html";
+        'use strict';
+        var navObject = {{{navStr}}};
+        window.nav = navObject;
+        window.AppHub = new window.AppHubUtil(navObject);
 
-        function initAppNavFrame(frame) {
-          /* Bind app nav utils */
-          var AppHubUtil = window.AppHubUtil = (window.AppHubUtil || {});
-          AppHubUtil.Nav = new frameEl.contentWindow.NavUtil({
-            items: window.nav.main.items,
-            contextPath: window.nav.contextPath,
-            microAppPaths: window.nav.paths
+        function initApp() {
+          initLocationListeners();
+          initAppFrame();
+          initAppNav();
+          initUserProfile();
+        };
+
+        function initAppFrame() {
+          var frame = document.getElementById('app');
+          /* Detect app navigation events */
+          frame.onload = function() {
+            console.log('%s was loaded in the iFrame', frame.src);
+            frame.contentWindow.addEventListener('hashchange', frameOnHashChange.bind(null, frame));
+            frame.contentWindow.addEventListener('popstate', framePopState.bind(null, frame));
+          };
+          /* Load initial route */
+          var path = addChromelessQuery(getPath(window.location));
+          frame.src = path;
+        };
+
+        function initAppNav() {
+          var appNavElement = document.getElementById('app-nav');
+          /* Set the initial keys and items */
+          appNavElement.keys = {
+            id: 'id',
+            label: 'label',
+            children: 'items',
+            icon: 'icon'
+          };
+          appNavElement.items = AppHub.Nav.getItems();
+          /**
+           * When the user changes the page, call the AppHub helpers to update
+           * the application state
+           */
+          appNavElement.addEventListener('selected-changed', function(e) {
+            setPagePath(e.detail.value.path);
+          });
+          /**
+           * If there is is an initial window path select the corresponding
+           * navigation item
+           */
+          if (window.location.pathname !== "") {
+            setSelectedNavPath(getPathWithoutQuery(window.location));
+          }
+        };
+
+        function initUserProfile() {
+
+        };
+
+        function initLocationListeners() {
+          window.onpopstate = function() {
+            window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed', {
+              detail: { source: 'popstate' }
+            }));
+          };
+
+          window.onhashchange = function() {
+            window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed', {
+              detail: { source: 'hashchange' }
+            }));
+          };
+
+          window.addEventListener('app-hub-shell-location-changed', function() {
+            setFramePath(addChromelessQuery(getPath(window.location)));
+            setSelectedNavPath(getPathWithoutQuery(window.location));
           });
         };
 
-        window.addEventListener('app-hub-nav-opening', function(e) {
-          frameEl.classList.add('__pds-chrome__app-nav__frame--opened');
-        });
-        window.addEventListener('app-hub-nav-closing', function(e) {
-          frameEl.classList.remove('__pds-chrome__app-nav__frame--opened');
-        });
+        /**** UPDATE SHELL PAGE ELEMENTS ****/
+
+        function setPagePath(newPath) {
+          if (getPath(window.location) !== newPath) {
+            console.log('update page path')
+            history.pushState(null, null, newPath);
+            window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed'));
+          }
+        };
+
+        function setFramePath(newPath) {
+          var frame = document.getElementById('app');
+          if (getPath(frame.contentWindow.location) !== newPath) {
+            frame.contentWindow.location.replace(newPath, false);
+          }
+        };
+
+        function setSelectedNavPath(newPath) {
+          var appNavElement = document.getElementById('app-nav');
+          var item = AppHub.Nav.findNavItemByPath(newPath);
+          if (item !== null) {
+            appNavElement.select(item);
+          }
+        };
+
+        /**** HANDLE IFRAME NAVIGATION EVENTS ****/
+
+        function frameOnHashChange(frame) {
+
+        };
+
+        function frameOnPopState(frame) {
+
+        };
+
+        /**** SMALL URL UTILS ****/
+
+        function getPath(locationObject) {
+          return locationObject.pathname + locationObject.search + locationObject.hash;
+        };
+
+        function getPathWithoutQuery(locationObject) {
+          return locationObject.pathname +  locationObject.hash;
+        };
+
+        function addChromelessQuery(path) {
+          var uriParts = parseUri(path);
+          if (uriParts.queryKey.hasOwnProperty('chromeless') && uriParts.queryKey.chromeless === 'true') {
+            return path;
+          }
+          return uriParts.path + '?chromeless=true' + (uriParts.query.length>0 ? '&' + uriParts.query : '') + (uriParts.anchor.length>0 ? '#' + uriParts.anchor : '');
+        };
+
+        /**
+         * parseUri 1.2.2
+         * (c) Steven Levithan <stevenlevithan.com>
+         * MIT License
+         */
+        function parseUri (str) {
+          var	o   = parseUri.options,
+          m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+          uri = {},
+          i   = 14;
+          while (i--) uri[o.key[i]] = m[i] || "";
+          uri[o.q.name] = {};
+          uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+            if ($1) uri[o.q.name][$1] = $2;
+          });
+          return uri;
+        };
+        parseUri.options = {
+          strictMode: false,
+          key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+          q:   {
+            name:   "queryKey",
+            parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+          },
+          parser: {
+            strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+            loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+          }
+        };
+
+        /**
+         * CustomEvent polyfill
+         * Credit to https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+         */
+        (function() {
+          if (typeof window.CustomEvent === "function") return false;
+
+          function CustomEvent (event, params) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent('CustomEvent');
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+            return evt;
+           }
+
+          CustomEvent.prototype = window.Event.prototype;
+
+          window.CustomEvent = CustomEvent;
+        })();
+
+        if (window.WebComponentsReady) {
+          initApp();
+        } else {
+          window.addEventListener('WebComponentsReady', initApp.bind(this));
+        }
       })();
     </script>
-  {{/if}}
-  {{!-- Load Predix Design System chrome utilities --}}
-  <!-- <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-utilities.js"></script> -->
-  <script>
-    // (function() {
-    //   'use strict';
-    //   var navObject = {{{navStr}}};
-    //   window.nav = navObject;
-    //   window.AppHub = new window.AppHubUtil(navObject);
-    //
-    //   function initApp() {
-    //     initAppFrame();
-    //     initAppNav();
-    //     initUserProfile();
-    //   };
-    //
-    //   function initAppFrame() {
-    //     var frame = document.getElementById('app');
-    //     var microAppPath = AppHub.Nav.getFullMicroAppPath();
-    //     frame.src = AppHub.Nav.addQueryToPath(microAppPath, '?chromeless=true');
-    //     /* Detect app navigation events */
-    //     frame.onload = function() {
-    //       console.log('%s was loaded in the iFrame', frame.src);
-    //     };
-    //   };
-    //
-    //   function initAppNav() {
-    //     var appNavElement = document.getElementById('app-nav');
-    //     /* Set the initial keys and items */
-    //     appNavElement.keys = {
-    //       id: 'id',
-    //       label: 'label',
-    //       children: 'items',
-    //       icon: 'icon'
-    //     };
-    //     appNavElement.items = AppHub.Nav.getItems();
-    //     /**
-    //      * When the user changes the page, call the AppHub helpers to update
-    //      * the application state
-    //      */
-    //     appNavElement.addEventListener('selected-changed', function(e) {
-    //       AppHub.Nav.navigateToItemPath(e.detail.value);
-    //     });
-    //     /**
-    //      * If there is is an initial window path select the corresponding
-    //      * navigation item
-    //      */
-    //     if (window.location.pathname !== "") {
-    //       var microAppPath = AppHub.Nav.getFullMicroAppPath();
-    //       var navItem = AppHub.Nav.findNavItemByPath(microAppPath);
-    //       if (navItem !== null) {
-    //         appNavElement.selected = navItem;
-    //       }
-    //     }
-    //   };
-    //
-    //   function initUserProfile() {
-    //
-    //   };
-    //
-    //   if (window.WebComponentsReady) {
-    //     initApp();
-    //   } else {
-    //     window.addEventListener('WebComponentsReady', initApp.bind(this));
-    //   }
-    // })();
-  </script>
-</html>
+  </body>
+  </html>
+{{/if}}

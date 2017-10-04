@@ -1,0 +1,122 @@
+{
+  "main": {
+    "items": [
+      {
+        "id": "dashboards.0",
+        "label": "Dashboards",
+        "icon": "px-fea:dashboard",
+        "path": "/local/dashboards/#/",
+        "badge": {
+          "status": "important",
+          "count": 22
+        },
+        "items": [
+          {
+            "label": "Dashboards Subpage 1",
+            "path": "/local/dashboards/#/subnav1",
+            "badge": {
+              "status": "warning",
+              "count": 3
+            },
+            "id": "dashboards.0.0"
+          },
+          {
+            "label": "Dashboards Subpage 2",
+            "path": "/local/dashboards/#/subnav2",
+            "badge": {
+              "status": "error",
+              "count": 2
+            },
+            "id": "dashboards.0.1"
+          }
+        ]
+      },
+      {
+        "id": "analytics.0",
+        "label": "Analytics",
+        "icon": "px-fea:analytics",
+        "path": "/local/analytics/#/",
+        "badge": {
+          "status": "important",
+          "count": 22
+        },
+        "items": [
+          {
+            "label": "Analytics Subpage 1",
+            "path": "/local/analytics/#/subnav1",
+            "badge": {
+              "status": "warning",
+              "count": 3
+            },
+            "id": "analytics.0.0"
+          },
+          {
+            "label": "Analytics Subpage 2",
+            "path": "/local/analytics/#/subnav2",
+            "badge": {
+              "status": "error",
+              "count": 2
+            },
+            "id": "analytics.0.1"
+          }
+        ]
+      }
+    ]
+  },
+  "profile": {
+    "items": [
+      {
+        "label": "My Profile",
+        "path": "/local/user/#/",
+        "items": [
+          {
+            "label": "Profile Detail1",
+            "path": "/local/user/#/",
+            "id": "user.0.0"
+          },
+          {
+            "label": "Your network",
+            "path": "/local/user/#/network",
+            "id": "user.0.1"
+          }
+        ],
+        "id": "user.0"
+      }
+    ]
+  },
+  "settings": {
+    "items": [
+      {
+        "label": "Settings",
+        "path": "/local/settings/#/",
+        "items": [
+          {
+            "label": "settings global",
+            "path": "/local/settings/#/global",
+            "id": "settings_sub.0.0"
+          },
+          {
+            "label": "Help",
+            "path": "https://www.predix.io/resources",
+            "id": "settings_sub.0.1"
+          }
+        ],
+        "id": "settings.0"
+      }
+    ]
+  },
+  "user": {
+    "name": "user1",
+    "firstName": "Thomas",
+    "lastName": "Edison",
+    "picture": "/ui-hub-assets/images/avatar.jpg"
+  },
+  "appName": "PDS Chrome Test",
+  "paths": {
+    "microapp": "/local/microapp",
+    "analytics": "/local/analytics",
+    "user": "/local/user"
+  },
+  "contextPath": "/local",
+  "localeData": { "logOut" : "Cerrar Sesión" }
+}
