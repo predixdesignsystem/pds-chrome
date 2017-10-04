@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const express = require('express');
+const minimist = require('minimist');
+
+const app = express();
+const args = minimist(process.argv.slice(2));
+const port = args.p ? args.p : 3005;
+
+/* Serve the root of this directory as static files */
+app.use('/', express.static(path.resolve(__dirname, '..')));
+
+app.listen(port, () => {
+  console.log(`Serving pds-chrome at http://localhost:${port}`);
+});
