@@ -24,7 +24,7 @@ You'll need to download and run the following repos on your computer:
 2. Run `npm install` (or `yarn install`) to install dependencies
 3. Run `npm run start`
 
-### [ui-config-service](https://github.build.ge.com/hubs/ui-config-service) (port 3004)
+### [ui-config-service](https://github.build.ge.com/hubs/ui-config-service) (port 3100)
 
 1. Clone [the repo](https://github.build.ge.com/hubs/ui-config-service) and `cd` into it
 2. Run `npm install` (or `yarn install`) to install dependencies
@@ -39,7 +39,7 @@ You'll need to download and run the following repos on your computer:
       "uaaServer": "https://dd8418b1-b93e-4e88-be62-172b2020ebf0.predix-uaa.run.asv-pr.ice.predix.io",
       "uaaClientId": "sessionproxy",
       "uaaClientSecret": "blahblah",
-      "configServiceHost": "http://localhost:3004",
+      "configServiceHost": "http://localhost:3100",
       "route": "localhost",
       "contextPath": "",
       "serverURL": "http://localhost:3000",
@@ -48,7 +48,7 @@ You'll need to download and run the following repos on your computer:
         "Cache-Control": "public, max-age=1209600"
       }
     },
-    "hubConfigService": "http://localhost:3004",
+    "hubConfigService": "http://localhost:3100",
     "searchPath": "/tenant"
   },
   "config": {
@@ -157,7 +157,7 @@ You'll need to download and run the following repos on your computer:
 }
 ```
 
-4. Run `npm run start`
+4. Run `PORT=3100 npm run start`
 
 ### [ui-app-hub](https://github.build.ge.com/212584602/ui-app-hub) (port 3000)
 
@@ -176,7 +176,7 @@ Make sure you clone [from this link](https://github.build.ge.com/212584602/ui-ap
       "uaaServer": "https://dd8418b1-b93e-4e88-be62-172b2020ebf0.predix-uaa.run.asv-pr.ice.predix.io",
       "uaaClientId": "sessionproxy",
       "uaaClientSecret": "blahblah",
-      "configServiceHost": "http://localhost:3004",
+      "configServiceHost": "http://localhost:3100",
       "route": "localhost",
       "contextPath": "",
       "serverURL": "http://localhost:3000",
@@ -185,8 +185,8 @@ Make sure you clone [from this link](https://github.build.ge.com/212584602/ui-ap
         "Cache-Control": "public, max-age=1209600"
       }
     },
-    "hubConfigService": "http://localhost:3004",
-    "searchPath": "/tenant"
+    "hubConfigService": "http://localhost:3100",
+    "searchPath": ""
   }
 }
 ```

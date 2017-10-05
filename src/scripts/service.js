@@ -1,3 +1,0 @@
-function Service() {
-  return true;
-}

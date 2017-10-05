@@ -129,7 +129,6 @@
     </div>
     {{!-- Load Predix Design System chrome utilities --}}
     <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/app-hub-utilities.js"></script>
-    <!-- <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-utilities.js"></script> -->
     <script>
       (function() {
         'use strict';
@@ -490,6 +489,8 @@
             href: fullNormalizedHref
           };
         };
+
+        /**** BOOTSTRAP THE APPLICATION ****/
 
         if (window.WebComponentsReady) {
           initApp();
