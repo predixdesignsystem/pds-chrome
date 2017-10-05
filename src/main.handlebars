@@ -148,9 +148,10 @@
           var frame = document.getElementById('app');
           /* Detect app navigation events */
           frame.onload = function() {
-            console.log('%s was loaded in the iFrame', frame.src);
-            frame.contentWindow.addEventListener('hashchange', frameOnHashChange.bind(null, frame));
-            frame.contentWindow.addEventListener('popstate', framePopState.bind(null, frame));
+            console.log('%s was loaded in the iFrame', getPath(frame.contentWindow.location));
+            frame.contentWindow.addEventListener('hashchange', handleFramePathChanged.bind(null, frame));
+            frame.contentWindow.addEventListener('popstate', handleFramePathChanged.bind(null, frame));
+            frame.contentWindow.document.addEventListener('click', handleFrameLinkClick.bind(null, frame));
           };
           /* Load initial route */
           var path = addChromelessQuery(getPath(window.location));
@@ -206,6 +207,36 @@
           });
         };
 
+        /**** HANDLE IFRAME NAVIGATION EVENTS ****/
+
+        function handleFramePathChanged(frame) {
+          var newPath = stripChromelessQuery(getPath(frame.contentWindow.location));
+          setPagePath(newPath);
+        };
+
+        function handleFrameLinkClick(frame, evt) {
+          // If another event handler has stopped this event then bail out
+          if (evt.defaultPrevented) {
+            return;
+          }
+          var linkOutcome = parseLinkTarget(evt, frame.contentWindow, frame.contentWindow.document);
+          if (linkOutcome.shouldIntercept === false) {
+            return;
+          }
+          if (linkOutcome.sameOrigin === false) {
+            // the link target URL was on a different origin from our app,
+            // replace the shell URL with the link target URL and reload
+            evt.preventDefault();
+            window.location.replace(linkOutcome.href, false);
+          }
+          if (linkOutcome.sameOrigin === true) {
+            // the link target URL was on the same origin as our app, push to the
+            // shell history stack which will update the iframe URL
+            evt.preventDefault();
+            setPagePath(linkOutcome.href);
+          }
+        };
+
         /**** UPDATE SHELL PAGE ELEMENTS ****/
 
         function setPagePath(newPath) {
@@ -231,16 +262,6 @@
           }
         };
 
-        /**** HANDLE IFRAME NAVIGATION EVENTS ****/
-
-        function frameOnHashChange(frame) {
-
-        };
-
-        function frameOnPopState(frame) {
-
-        };
-
         /**** SMALL URL UTILS ****/
 
         function getPath(locationObject) {
@@ -257,6 +278,24 @@
             return path;
           }
           return uriParts.path + '?chromeless=true' + (uriParts.query.length>0 ? '&' + uriParts.query : '') + (uriParts.anchor.length>0 ? '#' + uriParts.anchor : '');
+        };
+
+        function stripChromelessQuery(path) {
+          var uriParts = parseUri(path);
+          if (uriParts.queryKey.hasOwnProperty('chromeless') && uriParts.queryKey.chromeless === 'true') {
+            var queryKeys = Object.keys(uriParts.queryKey);
+            var queryString = (queryKeys.length > 1) ? chromelessQueryToString(queryKeys, uriParts.queryKey) : '';
+            return uriParts.path + queryString + (uriParts.anchor.length>0 ? '#' + uriParts.anchor : '');
+          }
+          return path;
+        };
+
+        function chromelessQueryToString(queryKeys, queryObject) {
+          return '?' + queryKeys.reduce(function(accum, key, index, array) {
+            if (key === 'chromeless') return accum;
+            accum.push(key + '=' + queryObject[key]);
+            return accum;
+          }, []).join('&');
         };
 
         /**
@@ -307,6 +346,150 @@
 
           window.CustomEvent = CustomEvent;
         })();
+
+        /**
+         * iron-location URL resolution helpers
+         * SOURCE: https://github.com/PolymerElements/iron-location/blob/10493907e6ba30b2bd9d21c0f91209d08416b4e8/iron-location.html
+         * LICENSE:
+         * Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+         * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+         * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+         * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+         * Code distributed by Google as part of the polymer project is also
+         * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+         */
+        var workingURL, urlDoc, urlBase, anchor;
+        /**
+         * @param {string} path
+         * @param {string=} base
+         * @return {!URL|!HTMLAnchorElement}
+         */
+        function resolveURL(path, base) {
+          if (workingURL === undefined) {
+            workingURL = false;
+            try {
+              var u = new URL('b', 'http://a');
+              u.pathname = 'c%20d';
+              workingURL = (u.href === 'http://a/c%20d');
+              workingURL = workingURL && (new URL('http://www.google.com/?foo bar').href === 'http://www.google.com/?foo%20bar');
+            } catch (e) {}
+          }
+          if (workingURL) {
+            return new URL(path, base);
+          }
+          if (!urlDoc) {
+            urlDoc = document.implementation.createHTMLDocument('url');
+            urlBase = urlDoc.createElement('base');
+            urlDoc.head.appendChild(urlBase);
+            anchor = /** @type {HTMLAnchorElement}*/(urlDoc.createElement('a'));
+          }
+          urlBase.href = base;
+          anchor.href = path.replace(/ /g, '%20');
+          return anchor;
+        };
+        window.resolveURL = resolveURL;
+        /**
+         * Returns an object detailing how to handle the result of this link
+         * click.
+         *
+         * If `response.shouldIntercept` is true, prevent default and handle
+         * this link click manually.
+         *
+         * If `response.sameOrigin` is false, load a completely new page in
+         * the shell.
+         *
+         * If `response.sameOrigin` is true, push to the history stack and
+         * update the iframe URL.
+         *
+         * The URL to load for any case except `shouldIntercept` = false is
+         * in `response.href`.
+         *
+         * @param {MouseEvent} event
+         * @param {window} windowContext
+         * @param {document} documentContext
+         * @return {object}
+         */
+        function parseLinkTarget(event, windowContext, documentContext) {
+          // We only care about left-clicks.
+          if (event.button !== 0) {
+            return { shouldIntercept: false };
+          }
+          // We don't want modified clicks, where the intent is to open the page
+          // in a new tab.
+          if (event.metaKey || event.ctrlKey || event.shiftKey) {
+            return { shouldIntercept: false };
+          }
+          var eventPath = event.path;
+          var anchor = null;
+          for (var i = 0; i < eventPath.length; i++) {
+            var element = eventPath[i];
+            if (element.tagName === 'A' && element.href) {
+              anchor = element;
+              break;
+            }
+          }
+          // If there's no link there's nothing to do.
+          if (!anchor) {
+            return { shouldIntercept: false };
+          }
+          // Target blank is a new tab, don't intercept.
+          if (anchor.target === '_blank') {
+            return { shouldIntercept: false };
+          }
+          var href = anchor.href;
+          // It only makes sense for us to intercept same-origin navigations.
+          // pushState/replaceState don't work with cross-origin links.
+          var url;
+          if (documentContext.baseURI != null) {
+            url = resolveURL(href, (documentContext.baseURI));
+          } else {
+            url = resolveURL(href);
+          }
+          var origin;
+          var _location = windowContext.location;
+          // IE Polyfill
+          if (_location.origin) {
+            origin = _location.origin;
+          } else {
+            origin = _location.protocol + '//' + _location.host;
+          }
+          var urlOrigin;
+          if (url.origin) {
+            urlOrigin = url.origin;
+          } else {
+            // IE always adds port number on HTTP and HTTPS on <a>.host but not on
+            // window.location.host
+            var urlHost = url.host;
+            var urlPort = url.port;
+            var urlProtocol = url.protocol;
+            var isExtraneousHTTPS = urlProtocol === 'https:' && urlPort === '443';
+            var isExtraneousHTTP = urlProtocol === 'http:' && urlPort === '80';
+            if (isExtraneousHTTPS || isExtraneousHTTP) {
+              urlHost = url.hostname;
+            }
+            urlOrigin = urlProtocol + '//' + urlHost;
+          }
+          if (urlOrigin !== origin) {
+            return {
+              shouldIntercept: true,
+              sameOrigin: false,
+              href: href
+            };
+          }
+          var normalizedHref = url.pathname + url.search + url.hash;
+          // pathname should start with '/', but may not if `new URL` is not supported
+          if (normalizedHref[0] !== '/') {
+            normalizedHref = '/' + normalizedHref;
+          }
+          // Need to use a full URL in case the containing page has a base URI.
+          var fullNormalizedHref = resolveURL(
+              normalizedHref, _location.href).href;
+          return {
+            shouldIntercept: true,
+            sameOrigin: true,
+            href: fullNormalizedHref
+          };
+        };
 
         if (window.WebComponentsReady) {
           initApp();

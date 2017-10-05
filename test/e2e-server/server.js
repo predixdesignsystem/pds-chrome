@@ -30,7 +30,12 @@ app.get('/', (req, res) => {
 
 app.get('/local/dashboards', (req, res) => {
   const chromeless = (req.query && req.query.chromeless === 'true') ? true : false;
-  res.send(mainTemplate(templateData(chromeless, '<h1>Dashboards Microapp</h1>')));
+  res.send(mainTemplate(templateData(chromeless, `
+    <h1>Dashboards Microapp</h1>
+    <p><a id="same-origin" href="/local/analytics/#/subnav1">Open Analytics Subpage 1</a></p>
+    <p><a id="different-origin" href="https://example.com/">Open Google</a></p>
+    <p><a id="target-blank" target="_blank" href="/local/analytics/#/subnav1">Open Analytics Subpage 1 in a new tab</a></p>
+  `)));
 });
 
 app.get('/local/analytics', (req, res) => {
