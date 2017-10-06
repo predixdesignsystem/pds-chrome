@@ -23,7 +23,7 @@
     {{!-- Load global PDSChromeService helpers --}}
     <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-service.js"></script>
     <script>
-      window.nav = window.parent.nav;
+      window.nav = PDSChromeService.compatability.wrapNavGlobal(window.parent.nav);
       window.chromeService = PDSChromeService.fromGlobal(window.nav);
     </script>
   </head>
@@ -165,7 +165,7 @@
             frame.contentWindow.document.addEventListener('click', handleFrameLinkClick.bind(null, frame));
             frame.contentWindow.addEventListener('app-hub-location-changed', handleFrameLocationChangedRequest.bind(null, frame));
             /* Handle requests from microapp */
-            frame.contentWindow.addEventListener('app-hub-navigation-changed', handleFrameNavigationChanged.bind(null, frame));
+            frame.contentWindow.addEventListener('app-hub-navigation-items-changed', handleFrameNavigationChanged.bind(null, frame));
           };
           /* Load initial route */
           var path = addChromelessQuery(getPath(window.location));

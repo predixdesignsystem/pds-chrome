@@ -181,6 +181,50 @@
     }));
   };
 
+  ////--------------------- COMPAT WRAPPERS FOR OLD PXH-CHROME CONCEPTS ---------------------////
+
+  PDSChromeService.compatability = {};
+
+  PDSChromeService.compatability.wrapNavGlobal = function(navGlobal) {
+    navGlobal.refresh = navGlobal.repaint = compatNavRefresh.bind(null);
+    // @TODO: Decide if we should wrap any more old window.nav methods
+    // in the event they're called by app code
+    return navGlobal;
+  };
+
+  function compatNavRefresh(id, backendRefresh) {
+    if (backendRefresh !== true) {
+      // Re-render nav from mutations made directly to the window.nav object
+      // NOTE: Unlike the old window.nav.refresh method, we can ignore the
+      // id in this case and just refresh all the nav items
+      window.dispatchEvent(new CustomEvent('app-hub-navigation-items-changed', {
+        detail: { mainItems: window.nav.main.items }
+      }));
+      return;
+    }
+    if (backendRefresh === true && (id && typeof id === 'string')) {
+      // Get the config for one app and update that item in the nav
+      PDSChromeService.util.getJSON('/config/nav/' + id, function(err, appConfig) {
+        if (err) return;
+        // @TODO: Need to finish up here and search for the app in window.nav.main.items,
+        // but it might not be there (could be in window.nav.profile.items or in
+        // window.nav.settings.items).
+        // appConfig: { items: Array<navItems: string>, id: string, path: string }
+      });
+      return;
+    }
+    if (backendRefresh === true) {
+      // Get the config for all apps, and update the items and other things in window.nav
+      PDSChromeService.util.getJSON('/config/', function(err, config) {
+        if (err) return;
+        // @TODO: Need to finish up here and decide what to do. The old `window.nav.refresh`
+        // when it hit this point updated the whole config from scratch but that
+        // might not make sense. Perhaps we should only update the items.
+        // config: WindowNavGlobal (window.nav)
+      });
+    }
+  };
+
   ////--------------------- PUBLIC STATIC UTIL METHODS ---------------------////
 
   PDSChromeService.util = {};
@@ -233,6 +277,29 @@
       }
     };
     return null;
+  };
+
+  PDSChromeService.util.getJSON = function(url, callback) {
+    var DONE = '4';
+    var OK = '200';
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function() {
+      if (httpRequest.readyState === DONE) {
+        if (httpRequest.status === OK) {
+          var response;
+          try {
+            response = JSON.parse(httpRequest.responseText);
+          } catch (err) {
+            return callback({ message: 'Response from server at "'+url+'" is not valid JSON' });
+          }
+          return callback(null, response);
+        } else {
+          return callback({ message: 'The server at "'+url+'" responded with error code "'+httpRequest.status+'"' });
+        }
+      }
+    }
+    httpRequest.open('GET', url, true);
+    httpRequest.send();
   };
 
   ////--------------------- PRIVATE STATIC METHODS ---------------------////

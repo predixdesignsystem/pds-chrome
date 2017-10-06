@@ -67,19 +67,32 @@ describe('[location]', function() {
         });
     });
 
-    it('Updates nav items when the iframe app fires an `app-hub-navigation-changed` with a reference to new mainItems', function(client, done) {
+    it('Updates nav items when the iframe app fires an `app-hub-navigation-items-changed` with a reference to new mainItems', function(client, done) {
       client
         .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
         .pause(500)
         .frame('app')
         .execute(function() {
           window.nav.main.items[0].label = 'Insights';
-          window.dispatchEvent(new CustomEvent('app-hub-navigation-changed', {
+          window.dispatchEvent(new CustomEvent('app-hub-navigation-items-changed', {
             detail: { mainItems: window.nav.main.items }
           }))
         }, [], function(){})
         .frame(null)
         .assert.containsText('#app-nav px-app-nav-group:nth-of-type(1) px-app-nav-item p', 'Insights');
+    });
+
+    it('Updates nav items when the iframe app calls window.nav.refresh() after mutating window.nav.main.items', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
+        .pause(500)
+        .frame('app')
+        .execute(function() {
+          window.nav.main.items[0].label = 'Information';
+          window.nav.refresh();
+        }, [], function(){})
+        .frame(null)
+        .assert.containsText('#app-nav px-app-nav-group:nth-of-type(1) px-app-nav-item p', 'Information');
     });
   });
 
