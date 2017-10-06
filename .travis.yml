@@ -10,4 +10,4 @@ before_script:
 - npm install -g nightwatch bower
 - bower install
 script:
-- nightwatch --config nightwatch.conf.js --env chromesauce
+- nightwatch --config nightwatch.conf.js
