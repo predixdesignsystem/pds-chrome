@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "px-colors-design": "^1.0.4",
-    "px-defaults-design": "^2.0.2",
-    "pxh-chrome": "git@github.build.ge.com:hubs/pxh-chrome.git#3.0.3"
+    "px-defaults-design": "^2.0.2"
   }
 }
