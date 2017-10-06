@@ -7,7 +7,7 @@ addons:
   sauce_connect: true
 before_script:
 - export PATH=$PWD/node_modules/.bin:$PATH
-- ./node_modules/.bin/bower install
-- npm install -g nightwatch
+- npm install -g nightwatch bower
+- bower install
 script:
 - nightwatch --config nightwatch.conf.js --env chromesauce
