@@ -213,5 +213,16 @@ describe('[navigation]', function() {
     //       client.assert.equal(result.value, newFrameUrl);
     //     });
     // });
+
+    it('Selects the correct navigation item with a path of the initial shell URL', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/#/subnav2')
+        .pause(500)
+        .execute(function() {
+          return document.querySelector('#app-nav').selected;
+        }, [], function(result) {
+          client.assert.equal(result.value.label, 'Dashboards Subpage 2');
+        });
+    });
   });
 });
