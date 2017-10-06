@@ -1,0 +1,13 @@
+sudo: false
+dist: trusty
+language: node_js
+node_js:
+- latest
+addons:
+  sauce_connect: true
+before_script:
+- export PATH=$PWD/node_modules/.bin:$PATH
+- ./node_modules/.bin/bower install
+- npm install -g nightwatch
+script:
+- nightwatch --config nightwatch.conf.js --env chromesauce
