@@ -20,6 +20,12 @@
     {{#each helpers.globalCSS}}
       <link rel="stylesheet" href="{{this}}"/>
     {{/each}}
+    {{!-- Load global PDSChromeService helpers --}}
+    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-service.js"></script>
+    <script>
+      window.nav = window.parent.nav;
+      window.chromeService = PDSChromeService.fromGlobal(window.nav);
+    </script>
   </head>
   <body>
     {{{body}}}
@@ -148,9 +154,11 @@
           /* Detect app navigation events */
           frame.onload = function() {
             console.log('%s was loaded in the iFrame', getPath(frame.contentWindow.location));
+            handleFramePathChanged(frame);
             frame.contentWindow.addEventListener('hashchange', handleFramePathChanged.bind(null, frame));
             frame.contentWindow.addEventListener('popstate', handleFramePathChanged.bind(null, frame));
             frame.contentWindow.document.addEventListener('click', handleFrameLinkClick.bind(null, frame));
+            frame.contentWindow.addEventListener('app-hub-location-changed', handleFrameLocationChangedRequest.bind(null, frame));
           };
           /* Load initial route */
           var path = addChromelessQuery(getPath(window.location));
@@ -236,11 +244,20 @@
           }
         };
 
+        function handleFrameLocationChangedRequest(frame, evt) {
+          var path;
+          if (evt.detail && evt.detail.path) {
+            path = evt.detail.path;
+          } else {
+            path = getPath(frame.contentWindow.location);
+          }
+          setPagePath(stripChromelessQuery(path));
+        };
+
         /**** UPDATE SHELL PAGE ELEMENTS ****/
 
         function setPagePath(newPath) {
           if (getPath(window.location) !== newPath) {
-            console.log('update page path')
             history.pushState(null, null, newPath);
             window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed'));
           }
