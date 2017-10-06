@@ -53,7 +53,7 @@ module.exports = {
   },
   "test_runner" : "mocha",
   /* Local chrome */
-  "chrome": { // your local Chrome browser (chromedriver)
+  "chrome": { 
     "desiredCapabilities": {
       "browserName": "chrome",
       "javascriptEnabled": true,
@@ -61,11 +61,11 @@ module.exports = {
     }
   },
   /* Browsers used on saucelabs */
-  "chromesauce": {
+  "chromemac": {
     "desiredCapabilities": {
       "browserName": "chrome",
       "platform": "OS X 10.11",
-      "version": "47",
-   },
-  },
+      "version": "47"
+    }
+  }
 };
