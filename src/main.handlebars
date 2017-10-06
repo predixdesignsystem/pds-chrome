@@ -134,13 +134,17 @@
       <iframe id="app"></iframe>
     </div>
     {{!-- Load Predix Design System chrome utilities --}}
-    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/app-hub-utilities.js"></script>
+    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-service.js"></script>
     <script>
       (function() {
         'use strict';
         var navObject = {{{navStr}}};
         window.nav = navObject;
-        window.AppHub = new window.AppHubUtil(navObject);
+
+        /* Private variables to hold stateful things */
+        var mainItems = window.nav && window.nav.main && Array.isArray(window.nav.main.items) ? window.nav.main.items : [{}];
+        var profileItems = null;
+        var settingsItems = null;
 
         function initApp() {
           initLocationListeners();
@@ -155,10 +159,13 @@
           frame.onload = function() {
             console.log('%s was loaded in the iFrame', getPath(frame.contentWindow.location));
             handleFramePathChanged(frame);
+            /* Handle location/navigation events */
             frame.contentWindow.addEventListener('hashchange', handleFramePathChanged.bind(null, frame));
             frame.contentWindow.addEventListener('popstate', handleFramePathChanged.bind(null, frame));
             frame.contentWindow.document.addEventListener('click', handleFrameLinkClick.bind(null, frame));
             frame.contentWindow.addEventListener('app-hub-location-changed', handleFrameLocationChangedRequest.bind(null, frame));
+            /* Handle requests from microapp */
+            frame.contentWindow.addEventListener('app-hub-navigation-changed', handleFrameNavigationChanged.bind(null, frame));
           };
           /* Load initial route */
           var path = addChromelessQuery(getPath(window.location));
@@ -174,13 +181,14 @@
             children: 'items',
             icon: 'icon'
           };
-          appNavElement.items = AppHub.Nav.getItems();
+          appNavElement.items = mainItems;
           /**
-           * When the user changes the page, call the AppHub helpers to update
-           * the application state
+           * When the user selects a new page, update the application state
            */
           appNavElement.addEventListener('selected-changed', function(e) {
-            setPagePath(e.detail.value.path);
+            if (e.detail && e.detail.value && e.detail.value.path) {
+              setPagePath(e.detail.value.path);
+            }
           });
           /**
            * If there is is an initial window path select the corresponding
@@ -214,7 +222,7 @@
           });
         };
 
-        /**** HANDLE IFRAME NAVIGATION EVENTS ****/
+        /**** HANDLE IFRAME EVENTS ****/
 
         function handleFramePathChanged(frame) {
           var newPath = stripChromelessQuery(getPath(frame.contentWindow.location));
@@ -254,6 +262,22 @@
           setPagePath(stripChromelessQuery(path));
         };
 
+        function handleFrameNavigationChanged(frame, evt) {
+          var appNavElement = document.getElementById('app-nav');
+          if (evt.detail && evt.detail.mainItems && Array.isArray(evt.detail.mainItems)) {
+            if (appNavElement.selected) {
+              appNavElement.select(null);
+            }
+            /* Running stringify+parse ensures a new deep clone of the items */
+            mainItems = JSON.parse(JSON.stringify(evt.detail.mainItems));
+            appNavElement.items = [{}];
+            appNavElement.items = mainItems;
+            if (window.location.pathname !== "") {
+              setSelectedNavPath(getPathWithoutQuery(window.location));
+            }
+          }
+        };
+
         /**** UPDATE SHELL PAGE ELEMENTS ****/
 
         function setPagePath(newPath) {
@@ -272,7 +296,7 @@
 
         function setSelectedNavPath(newPath) {
           var appNavElement = document.getElementById('app-nav');
-          var item = AppHub.Nav.findNavItemByPath(newPath);
+          var item = PDSChromeService.util.findNavItemByPath(newPath, mainItems);
           if (item !== null) {
             appNavElement.select(item);
           }

@@ -219,6 +219,22 @@
     }, []).join('&');
   };
 
+  PDSChromeService.util.findNavItemByPath = function(path, items) {
+    if (!path || path === "" || !items || !Array.isArray(items)) return null;
+    var queue = items.slice(0);
+    var item;
+    while (queue.length !== 0) {
+      item = queue.shift();
+      if (item.path === path) {
+        return item;
+      }
+      if (Array.isArray(item.items) && item.items.length > 0) {
+        queue = queue.concat(item.items);
+      }
+    };
+    return null;
+  };
+
   ////--------------------- PRIVATE STATIC METHODS ---------------------////
 
   /**

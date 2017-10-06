@@ -1,5 +1,5 @@
-describe('[navigation]', function() {
-  describe('[initial]', function() {
+describe('[location]', function() {
+  describe('[navigation]', function() {
     before(function(client, done) {
       done();
     });
@@ -16,20 +16,6 @@ describe('[navigation]', function() {
 
     beforeEach(function(client, done) {
       done();
-    });
-
-    it('Loads the microapp from the initial shell URL as a chromeless page in an iframe', function(client, done) {
-      client
-        .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
-        .pause(500)
-        .assert.attributeEquals('#app', 'src', client.globals.e2eServerBaseURL + '/local/dashboards/?chromeless=true');
-    });
-
-    it('Includes the URL hash and query from the initial shell URL in the iframe URL', function(client, done) {
-      client
-        .url(client.globals.e2eServerBaseURL + '/local/dashboards/?data=val#/subnav1')
-        .pause(500)
-        .assert.attributeEquals('#app', 'src', client.globals.e2eServerBaseURL + '/local/dashboards/?chromeless=true&data=val#/subnav1');
     });
 
     it('Updates the shell URL and iframe URL when a navigation item is tapped', function(client, done) {
@@ -68,6 +54,66 @@ describe('[navigation]', function() {
         }, [], function(result) {
           client.assert.equal(result.value, client.globals.e2eServerBaseURL + '/local/analytics/?chromeless=true#/subnav2')
         });
+    });
+
+    it('Selects the correct navigation item with a path of the initial shell URL', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/#/subnav2')
+        .pause(500)
+        .execute(function() {
+          return document.querySelector('#app-nav').selected;
+        }, [], function(result) {
+          client.assert.equal(result.value.label, 'Dashboards Subpage 2');
+        });
+    });
+
+    it('Updates nav items when the iframe app fires an `app-hub-navigation-changed` with a reference to new mainItems', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
+        .pause(500)
+        .frame('app')
+        .execute(function() {
+          window.nav.main.items[0].label = 'Insights';
+          window.dispatchEvent(new CustomEvent('app-hub-navigation-changed', {
+            detail: { mainItems: window.nav.main.items }
+          }))
+        }, [], function(){})
+        .frame(null)
+        .assert.containsText('#app-nav px-app-nav-group:nth-of-type(1) px-app-nav-item p', 'Insights');
+    });
+  });
+
+  describe('[URL state]', function() {
+    before(function(client, done) {
+      done();
+    });
+
+    after(function(client, done) {
+      client.end(function() {
+        done();
+      });
+    });
+
+    afterEach(function(client, done) {
+      done();
+    });
+
+    beforeEach(function(client, done) {
+      done();
+    });
+
+    it('Loads the microapp from the initial shell URL as a chromeless page in an iframe', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
+        .pause(500)
+        .assert.attributeEquals('#app', 'src', client.globals.e2eServerBaseURL + '/local/dashboards/?chromeless=true');
+    });
+
+    it('Includes the URL hash and query from the initial shell URL in the iframe URL', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/?data=val#/subnav1')
+        .pause(500)
+        .assert.attributeEquals('#app', 'src', client.globals.e2eServerBaseURL + '/local/dashboards/?chromeless=true&data=val#/subnav1');
     });
 
     it('Updates the shell URL when the iframe URL changes in a way that triggers the `onhashchange` listener', function(client, done) {
@@ -169,7 +215,7 @@ describe('[navigation]', function() {
         .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
         .pause(500)
         .frame('app')
-        .execute('window.dispatchEvent(new CustomEvent(\'app-hub-location-changed\', { detail: { path: \'/local/analytics/?chromeless=true\' }}))')
+        .execute(`window.dispatchEvent(new CustomEvent('app-hub-location-changed', { detail: { path: '/local/analytics/?chromeless=true' }}))`)
         .frame(null)
         .assert.urlEquals(newShellUrl)
         .execute(function() {
@@ -213,16 +259,5 @@ describe('[navigation]', function() {
     //       client.assert.equal(result.value, newFrameUrl);
     //     });
     // });
-
-    it('Selects the correct navigation item with a path of the initial shell URL', function(client, done) {
-      client
-        .url(client.globals.e2eServerBaseURL + '/local/dashboards/#/subnav2')
-        .pause(500)
-        .execute(function() {
-          return document.querySelector('#app-nav').selected;
-        }, [], function(result) {
-          client.assert.equal(result.value.label, 'Dashboards Subpage 2');
-        });
-    });
   });
 });
