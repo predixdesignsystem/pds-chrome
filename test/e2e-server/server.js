@@ -43,6 +43,23 @@ app.get('/local/analytics', (req, res) => {
   res.send(mainTemplate(templateData(chromeless, '<h1>Analytics Microapp</h1>')));
 });
 
+app.get('/config/nav/:id', (req, res) => {
+  if (req.params.id === 'dashboards') {
+    res.json({
+      id: 'dashboards',
+      path: '/local/dashboards',
+      items: [navData.main.items[0]]
+    });
+  }
+  if (req.params.id === 'analytics') {
+    res.json({
+      id: 'dashboards',
+      path: '/local/analytics',
+      items: [navData.main.items[1]]
+    });
+  }
+});
+
 exports = module.exports = (function() {
   this.port = null;
   this.server = null;

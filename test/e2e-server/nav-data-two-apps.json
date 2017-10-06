@@ -113,7 +113,7 @@
   },
   "appName": "PDS Chrome Test",
   "paths": {
-    "microapp": "/local/microapp",
+    "dashboards": "/local/dashboards",
     "analytics": "/local/analytics",
     "user": "/local/user"
   },
