@@ -229,4 +229,5 @@ This configuration should be added to the ui-app-hub core configuration JSON fil
 The following `options` can be sent:
 
 * `brandingBar` | `{object}`
-  * `disabled` | `{boolean=true}` | Hides the branding bar
+  * `disabled` | `{boolean=false}` | Hides the branding bar
+  * `hideLogo` | `{boolean=false}` | Hides the logo next to the app name

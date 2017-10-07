@@ -118,7 +118,12 @@
     <div id="header">
       {{#if customThemeOptions.brandingBar.disabled}}
       {{else}}
-      <px-branding-bar id="branding-bar" application-title="{{appname}}"></px-branding-bar>
+      <px-branding-bar id="branding-bar" application-title="{{appname}}">
+        {{#if customThemeOptions.brandingBar.hideLogo}}
+        <div slot="logo">{{!-- empty --}}</div>
+        {{else}}
+        {{/if}}
+      </px-branding-bar>
       {{/if}}
       <px-app-nav id="app-nav">
         <pds-chrome-user-profile id="user-profile" slot="actions"

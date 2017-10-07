@@ -37,6 +37,7 @@ describe('[branding bar]', function() {
         .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
         .pause(500)
         .assert.containsText('#branding-bar .px-branding-bar__powered-by-text', 'Powered by')
+        .assert.elementPresent('#branding-bar predix-logo')
         .assert.visible('#branding-bar predix-logo');
     });
 
@@ -73,6 +74,13 @@ describe('[branding bar]', function() {
         .url(client.globals.e2eServerBaseURL + '/local/dashboards/?customThemeOptions[brandingBar][disabled]=true')
         .pause(500)
         .assert.elementNotPresent('#branding-bar');
+    });
+
+    it('Hides the app logo if `customThemeOptions.brandingBar.hideLogo` is true', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/?customThemeOptions[brandingBar][hideLogo]=true')
+        .pause(500)
+        .assert.elementNotPresent('#branding-bar px-ge-svg-logo');
     });
   });
 });
