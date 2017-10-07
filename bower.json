@@ -19,7 +19,8 @@
     "webcomponentsjs": "^0.7.0",
     "px-app-nav": "^2.0.0",
     "px-branding-bar": "^1.0.0",
-    "px-theme": "^3.0.0"
+    "px-theme": "^3.0.0",
+    "px-dropdown": "^4.0.14"
   },
   "devDependencies": {
     "px-colors-design": "^1.0.4",

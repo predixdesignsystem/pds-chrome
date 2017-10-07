@@ -1,3 +1,6 @@
+<link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
+<link rel="import" href="/ui-hub-assets/bower_components/px-dropdown/px-dropdown.html"/>
+
 <dom-module id="pds-chrome-user-profile">
   <template>
     <style>
@@ -43,9 +46,12 @@
       <!-- Shows name as a dropdown trigger if profile links provided -->
       <template is="dom-if" if="[[profileLinks]]">
         <px-dropdown
+            id="profileLinksDropDown"
             items="[[_convertLinksToItems(profileLinks)]]"
             button-style="bare"
-            display-value="[[name]]">
+            hide-selected
+            display-value="[[name]]"
+            on-px-dropdown-click="_profileLinkClicked">
         </px-dropdown>
       </template>
     </div>
@@ -73,6 +79,18 @@
           type: Array,
           value: null
         }
+      },
+      _convertLinksToItems: function(links){
+        var items = [];
+
+        links.forEach(function(link){
+          items.push({"key": link.path, "val": link.label});
+        });
+        return items;
+      },
+      _profileLinkClicked: function(evt){
+        evt = Polymer.dom(evt);
+        Polymer.dom(this.root).querySelector('#profileLinksDropDown').toggle();
       }
     })
   </script>
