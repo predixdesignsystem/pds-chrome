@@ -211,3 +211,22 @@ Now, open http://localhost:3000/. For the login, use "demo/demo".
 If you make any changes to the pds-chrome repo, you should get them automatically on page refresh.
 
 If you can any changes to the ui-config-service configuration, you'll need to logout and log back in. Load http://localhost:3000/logout to logout, or close the browser and open in a new tab (no need to go incognito, sessions are not sticky across tabs).
+
+## Configuring theme
+
+The look and feel of the pds-chrome theme can be configured through the ui-app-hub config service. Configurations are global across an ui-app-hub instance, and can't be changed for each micro app.
+
+This configuration should be added to the ui-app-hub core configuration JSON file:
+
+```json
+"theme": {
+  "baseUri": "http://url-of-server-running-pds-chrome.example.com",
+  "main": "src/main.handlebars",
+  "options": {}
+}
+```
+
+The following `options` can be sent:
+
+* `brandingBar` | `{object}`
+  * `disabled` | `{boolean=true}` | Hides the branding bar

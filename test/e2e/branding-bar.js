@@ -44,27 +44,35 @@ describe('[branding bar]', function() {
       client
         .url(client.globals.e2eServerBaseURL + '/local/dashboards/')
         .pause(500)
+        .assert.elementPresent('#branding-bar')
         .assert.visible('#branding-bar');
     });
   });
 
-  // describe('[with configuration]', function() {
-  //   before(function(client, done) {
-  //     done();
-  //   });
-  //
-  //   after(function(client, done) {
-  //     client.end(function() {
-  //       done();
-  //     });
-  //   });
-  //
-  //   afterEach(function(client, done) {
-  //     done();
-  //   });
-  //
-  //   beforeEach(function(client, done) {
-  //     done();
-  //   });
-  // });
+  describe('[with configuration]', function() {
+    before(function(client, done) {
+      done();
+    });
+
+    after(function(client, done) {
+      client.end(function() {
+        done();
+      });
+    });
+
+    afterEach(function(client, done) {
+      done();
+    });
+
+    beforeEach(function(client, done) {
+      done();
+    });
+
+    it('Hides the branding bar if `customThemeOptions.brandingBar.disabled` is true', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/?customThemeOptions[brandingBar][disabled]=true')
+        .pause(500)
+        .assert.elementNotPresent('#branding-bar');
+    });
+  });
 });

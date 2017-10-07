@@ -102,7 +102,7 @@
       #app {
         display: block;
         position: fixed;
-        top: 6rem;
+        top: 6rem; /* height of px-branding-bar + px-app-nav */
         left: 0;
         right: 0;
         bottom: 0;
@@ -110,11 +110,17 @@
         height: 100%;
         border: none;
       }
+      body.theme--branding-bar-disabled #app {
+        top: 4rem; /* height of px-app-nav */
+      }
     </style>
   </head>
-  <body>
+  <body class="{{#if customThemeOptions.brandingBar.disabled}}theme--branding-bar-disabled{{else}}{{/if}}">
     <div id="header">
+      {{#if customThemeOptions.brandingBar.disabled}}
+      {{else}}
       <px-branding-bar id="branding-bar" application-title="{{appname}}"></px-branding-bar>
+      {{/if}}
       <px-app-nav id="app-nav">
         <pds-chrome-user-profile id="user-profile" slot="actions"
             name="David Leonard"
