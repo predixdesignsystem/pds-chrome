@@ -114,17 +114,18 @@
       }
     </style>
   </head>
-  <body class="{{#if customThemeOptions.brandingBar.disabled}}theme--branding-bar-disabled{{else}}{{/if}}">
+  <body class="{{#if customThemeOptions.brandingBar.disabled}}theme--branding-bar-disabled{{/if}}">
     <div id="header">
-      {{#if customThemeOptions.brandingBar.disabled}}
-      {{else}}
+      {{#unless customThemeOptions.brandingBar.disabled}}
       <px-branding-bar id="branding-bar" application-title="{{appname}}">
         {{#if customThemeOptions.brandingBar.hideLogo}}
         <div slot="logo">{{!-- empty --}}</div>
-        {{else}}
+        {{/if}}
+        {{#if customThemeOptions.brandingBar.hideAttribution}}
+        <div slot="attribution">{{!-- empty --}}</div>
         {{/if}}
       </px-branding-bar>
-      {{/if}}
+      {{/unless}}
       <px-app-nav id="app-nav">
         <pds-chrome-user-profile id="user-profile" slot="actions"
             name="David Leonard"

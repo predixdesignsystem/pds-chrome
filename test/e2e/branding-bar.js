@@ -82,5 +82,13 @@ describe('[branding bar]', function() {
         .pause(500)
         .assert.elementNotPresent('#branding-bar px-ge-svg-logo');
     });
+
+    it('Hides the "Powered by Predix" attribution if `customThemeOptions.brandingBar.hideAttribution` is true', function(client, done) {
+      client
+        .url(client.globals.e2eServerBaseURL + '/local/dashboards/?customThemeOptions[brandingBar][hideAttribution]=true')
+        .pause(500)
+        .assert.elementNotPresent('#branding-bar .px-branding-bar__powered-by-text')
+        .assert.elementNotPresent('#branding-bar predix-logo');
+    });
   });
 });

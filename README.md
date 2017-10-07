@@ -228,6 +228,7 @@ This configuration should be added to the ui-app-hub core configuration JSON fil
 
 The following `options` can be sent:
 
-* `brandingBar` | `{object}`
-  * `disabled` | `{boolean=false}` | Hides the branding bar
-  * `hideLogo` | `{boolean=false}` | Hides the logo next to the app name
+* `brandingBar: Object`
+  * `disabled: boolean = false` | Hides the branding bar
+  * `hideLogo: boolean = false` | Hides the logo next to the app name
+  * `hideAttribution: boolean = false` | Hides the 'Powered by Predix' text and logo
