@@ -127,17 +127,7 @@
       </px-branding-bar>
       {{/unless}}
       <px-app-nav id="app-nav">
-        <pds-chrome-user-profile id="user-profile" slot="actions"
-            name="David Leonard"
-            img-url="/ui-hub-assets/bower_components/pds-chrome/test/img/profile-picture.jpg"
-            profile-links='[
-              {"label":"Edit profile", "path":"/user/#/profile"},
-              {"label":"Logout", "path":"/logout"}
-            ]'
-            settings-links='[
-              {"label":"Preferences", "path":"/settings/#/preferences"},
-              {"label":"Manage team", "path":"/settings/#/team"}
-            ]'>
+        <pds-chrome-user-profile id="user-profile" slot="actions">
         </pds-chrome-user-profile>
       </px-app-nav>
     </div>
@@ -154,8 +144,9 @@
 
         /* Private variables to hold stateful things */
         var mainItems = window.nav && window.nav.main && Array.isArray(window.nav.main.items) ? window.nav.main.items : [{}];
-        var profileItems = null;
-        var settingsItems = null;
+        var profileItems = window.nav && window.nav.profile && Array.isArray(window.nav.profile.items) ? window.nav.profile.items : [];
+        var settingsItems = window.nav && window.nav.settings && Array.isArray(window.nav.settings.items) ? window.nav.settings.items : null;
+        var logoutPath = window.nav && window.nav.contextPath ? window.nav.contextPath + '/logout' : '/logout';
 
         function initApp() {
           initLocationListeners();
@@ -211,7 +202,44 @@
         };
 
         function initUserProfile() {
-
+          var userProfileElement = document.getElementById('user-profile');
+          userProfileElement.profileLinks = profileItems;
+          userProfileElement.settingsLinks = settingsItems;
+          userProfileElement.logoutPath = logoutPath;
+          /* Set user's profile image, if available */
+          if (window.nav && window.nav.user && window.nav.user.picture) {
+            userProfileElement.imgUrl = window.nav.user.picture;
+          }
+          /* User user's firstName + lastName, fallback to name, then fallback to 'User' */
+          if (window.nav && window.nav.user && window.nav.user.firstName && window.nav.user.lastName) {
+            userProfileElement.name = window.nav.user.firstName + ' ' + window.nav.user.lastName;
+          }
+          else if (window.nav && window.nav.user && window.nav.user.name) {
+            userProfileElement.name = window.nav.user.name;
+          }
+          else {
+            userProfileElement.name = 'User';
+          }
+          /* Listen for link selections */
+          userProfileElement.addEventListener('app-hub-user-profile-link-selected', function(evt) {
+            if (evt.detail.path) {
+              if (evt.detai.path === logoutPath) {
+                // Skip straight to logging out
+                window.location.replace(linkOutcome.href, false);
+              }
+              var linkOutcome = parseTarget(evt.detail.path, window, document);
+              if (linkOutcome.sameOrigin === false) {
+                // the link target URL was on a different origin from our app,
+                // replace the shell URL with the link target URL and reload
+                window.location.replace(linkOutcome.href, false);
+              }
+              if (linkOutcome.sameOrigin === true) {
+                // the link target URL was on the same origin as our app, push to the
+                // shell history stack which will update the iframe URL
+                setPagePath(linkOutcome.href);
+              }
+            }
+          });
         };
 
         function initLocationListeners() {
@@ -488,9 +516,12 @@
             return { shouldIntercept: false };
           }
           var href = anchor.href;
+          return parseTarget(href, windowContext, documentContext);
+        };
+        function parseTarget(href, windowContext, documentContext) {
+          var url;
           // It only makes sense for us to intercept same-origin navigations.
           // pushState/replaceState don't work with cross-origin links.
-          var url;
           if (documentContext.baseURI != null) {
             url = resolveURL(href, (documentContext.baseURI));
           } else {

@@ -47,11 +47,25 @@
       <template is="dom-if" if="[[profileLinks]]">
         <px-dropdown
             id="profileLinksDropDown"
-            items="[[_convertLinksToItems(profileLinks)]]"
+            items="[[_convertProfileLinksToItems(profileLinks)]]"
+            on-selected-changed="_profileLinkClicked"
+            display-value="[[name]]"
             button-style="bare"
             hide-selected
+            disable-clear>
+        </px-dropdown>
+      </template>
+      <!-- Shows settings link dropdown if settings links provided -->
+      <template is="dom-if" if="[[settingsLinks]]">
+        <px-dropdown
+            id="settingsLinksDropdown"
+            items="[[_convertSettingsLinksToItems(settingsLinks)]]"
             display-value="[[name]]"
-            on-px-dropdown-click="_profileLinkClicked">
+            on-selected-changed="_settingsLinkClicked"
+            button-style="icon"
+            icon="px-utl:app-settings"
+            hide-selected
+            disable-clear>
         </px-dropdown>
       </template>
     </div>
@@ -64,6 +78,11 @@
         name: {
           type: String
         },
+        /** Path to load to log the user out */
+        logoutPath: {
+          type: String,
+          value: '/logout'
+        },
         /** (Optional) Path to an optional profile image */
         imgUrl: {
           type: String,
@@ -72,7 +91,9 @@
         /** (Optional) List of links placed in a dropdown menu next to the user's name */
         profileLinks: {
           type: Array,
-          value: null
+          value: function() {
+            return [];
+          }
         },
         /** (Optional) List of links placed in a dropdown opened with a settings icon */
         settingsLinks: {
@@ -80,17 +101,32 @@
           value: null
         }
       },
-      _convertLinksToItems: function(links){
-        var items = [];
-
-        links.forEach(function(link){
-          items.push({"key": link.path, "val": link.label});
-        });
-        return items;
+      _convertProfileLinksToItems: function(links) {
+        return links.map(function(link) {
+          return { key: link.path, val: link.label };
+        })
+        .concat([{ key: this.logoutPath, val: 'Logout' }]);
       },
-      _profileLinkClicked: function(evt){
-        evt = Polymer.dom(evt);
-        Polymer.dom(this.root).querySelector('#profileLinksDropDown').toggle();
+      _convertSettingsLinksToItems: function(links) {
+        return links.map(function(link) {
+          return { key: link.path, val: link.label };
+        });
+      },
+      _profileLinkClicked: function(evt) {
+        if (evt.detail.value) {
+          var dropdown = Polymer.dom(this.root).querySelector('#profileLinksDropDown');
+          dropdown.toggle();
+          dropdown.selected = null;
+          this.fire('app-hub-user-profile-link-selected', { path: evt.detail.value });
+        }
+      },
+      _settingsLinkClicked: function(evt) {
+        if (evt.detail.value) {
+          var dropdown = Polymer.dom(this.root).querySelector('#settingsLinksDropdown');
+          dropdown.toggle();
+          dropdown.selected = null;
+          this.fire('app-hub-user-profile-link-selected', { path: evt.detail.value });
+        }
       }
     })
   </script>

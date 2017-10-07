@@ -109,7 +109,7 @@
     "name": "user1",
     "firstName": "Thomas",
     "lastName": "Edison",
-    "picture": "/ui-hub-assets/images/avatar.jpg"
+    "picture": "/ui-hub-assets/bower_components/pds-chrome/test/img/profile-picture.jpg"
   },
   "appName": "PDS Chrome Test",
   "paths": {
