@@ -10,8 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{appname}}</title>
+    <link async rel="preload" href="http://dzlpbrbc7yvq0.cloudfront.net/predixdev/fonts/2.0.0/GEInspiraSans.woff" as="font" type="font/woff2" crossorigin>
     {{!-- Load favico and global theme stylesheets  --}}
-    <link rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
+    <link async rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
     {{!-- Load global scripts and CSS specified by app --}}
     {{#each helpers.globalScripts}}
       <script src="{{this}}"></script>
@@ -73,14 +74,8 @@
       }
     })();
     </script>
-    {{!-- Load Polymer library --}}
-    <link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
     {{!-- Load Predix Design System components --}}
-    <link rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
-    <link rel="import" href="/ui-hub-assets/bower_components/px-branding-bar/px-branding-bar.html"/>
-    <link rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
-    {{!-- Load pds-chrome local components --}}
-    <link rel="import" href="/ui-hub-assets/bower_components/pds-chrome/src/elements/pds-chrome-user-profile.html"/>
+    <link defer rel="import" href="/ui-hub-assets/bower_components/pds-chrome/build/es5-bundled/src/scripts/pds-chrome-loader.html"/>
     {{!-- Use Predix Design System light theme --}}
     <style is="custom-style" include="px-theme-styles"></style>
     {{!-- Set basic theme chrome styles --}}
