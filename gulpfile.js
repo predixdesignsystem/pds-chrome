@@ -86,7 +86,7 @@ const autoprefixerOptions = {
 };
 
 gulp.task('sass:clean', function() {
-  return del(['./dist/css/**/*']);
+  return del(['./css/**/*']);
 });
 
 gulp.task('sass:build', function() {
@@ -94,7 +94,7 @@ gulp.task('sass:build', function() {
     .pipe(sass(sassOptions))
     .pipe(autoprefixer(autoprefixerOptions))
     .pipe(cssmin())
-    .pipe(gulp.dest('./dist/css'))
+    .pipe(gulp.dest('./css'))
 });
 
 gulp.task('sass', ['sass:clean', 'sass:build']);
