@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["src/scripts/pds-chrome-loader.html","62abfef4347438a3da27b5e875a7cda1"]];
+var precacheConfig = [["src/scripts/pds-chrome-loader.html","da2e8579dcbc839a85bc5511124bd21e"]];
 var cacheName = 'sw-precache-v3--' + (self.registration ? self.registration.scope : '');
 
 
