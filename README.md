@@ -64,7 +64,7 @@ You'll need to download and run the following repos on your computer:
     },
     "theme": {
       "baseUri": "http://localhost:3005",
-      "main": "src/main.handlebars",
+      "main": "build/es6/views/main.handlebars",
       "options": {
         "nav": {
           "position": "horizontal"
@@ -221,7 +221,7 @@ This configuration should be added to the ui-app-hub core configuration JSON fil
 ```json
 "theme": {
   "baseUri": "http://url-of-server-running-pds-chrome.example.com",
-  "main": "src/main.handlebars",
+  "main": "build/es6/views/main.handlebars",
   "options": {}
 }
 ```
