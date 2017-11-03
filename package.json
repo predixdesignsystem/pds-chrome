@@ -1,7 +1,8 @@
 {
   "name": "pds-chrome",
-  "version": "1.0.0",
-  "description": "",
+  "description": "A custom theme for the Predix AppHub service built with the Predix Design System",
+  "version": "1.0.0-alpha.1",
+  "homepage": "https://github.com/predixdesignsystem/pds-chrome/",
   "scripts": {
     "start": "./bin/start-chrome-server",
     "test:e2e": "./node_modules/.bin/nightwatch",

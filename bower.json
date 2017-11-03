@@ -1,18 +1,12 @@
 {
   "name": "pds-chrome",
-  "description": "",
-  "main": "",
-  "authors": [
-    "David Leonard <davidrobertleonard@gmail.com>"
-  ],
-  "license": "MIT",
-  "homepage": "",
+  "description": "A custom theme for the Predix AppHub service built with the Predix Design System",
+  "version": "1.0.0-alpha.1",
+  "homepage": "https://github.com/predixdesignsystem/pds-chrome/",
   "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
+    "*",
+    "!build/*",
+    "!README.md"
   ],
   "dependencies": {
     "polymer": "^1.11.0",
