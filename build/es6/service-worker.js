@@ -37,7 +37,7 @@
 /* eslint-disable indent, no-unused-vars, no-multiple-empty-lines, max-nested-callbacks, space-before-function-paren, quotes, comma-spacing */
 'use strict';
 
-var precacheConfig = [["src/scripts/pds-chrome-loader.html","da2e8579dcbc839a85bc5511124bd21e"]];
+var precacheConfig = [["elements/pds-chrome-loader.html","a7d76a96b75a3a4a49dec4adb991b219"]];
 var cacheName = 'sw-precache-v3--' + (self.registration ? self.registration.scope : '');
 
 
@@ -229,7 +229,7 @@ self.addEventListener('fetch', function(event) {
 
     // If shouldRespond is still false, check to see if this is a navigation
     // request, and if so, whether the URL matches navigateFallbackWhitelist.
-    var navigateFallback = 'src/scripts/pds-chrome-loader.html';
+    var navigateFallback = 'elements/pds-chrome-loader.html';
     if (!shouldRespond &&
         navigateFallback &&
         (event.request.mode === 'navigate') &&

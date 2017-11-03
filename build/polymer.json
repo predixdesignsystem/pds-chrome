@@ -1,17 +1,20 @@
 {
-  "entrypoint": "src/scripts/pds-chrome-loader.html",
+  "entrypoint": "elements/pds-chrome-loader.html",
   "fragments": [],
   "sources": [
     "bower.json",
-    "src/scripts/pds-chrome-loader.html"
+    "elements/pds-chrome-loader.html"
   ],
   "extraDependencies": [
     "bower_components/webcomponentsjs/*.js",
-    "bower_components/webcomponentsjs/webcomponents-lite.js"
+    "bower_components/webcomponentsjs/webcomponents-lite.js",
+    "views/*",
+    "scripts/*",
+    "css/*"
   ],
   "builds": [
     {
-      "name": "es5-bundled",
+      "name": "es5",
       "js": {
         "minify": true,
         "compile": true
@@ -26,6 +29,26 @@
       "addServiceWorker": true,
       "addPushManifest": true,
       "preset": "es5-bundled"
+    },
+    {
+      "name": "es6",
+      "browserCapabilities": [
+        "es2015"
+      ],
+      "js": {
+        "minify": true,
+        "compile": false
+      },
+      "css": {
+        "minify": false
+      },
+      "html": {
+        "minify": true
+      },
+      "bundle": true,
+      "addServiceWorker": true,
+      "addPushManifest": true,
+      "preset": "es6-bundled"
     }
   ]
 }

@@ -1,61 +1,3 @@
-// const gulp = require('gulp');
-// const browserify = require('browserify');
-// const source = require('vinyl-source-stream');
-// const watchify = require("watchify");
-// const tsify = require('tsify');
-// const buffer = require('vinyl-buffer');
-// const sourcemaps = require('gulp-sourcemaps');
-// const uglify = require('gulp-uglify');
-// const util = require('gulp-util');
-
-// const browserifyConfig = {
-//   basedir: '.',
-//   debug: true,
-//   entries: ['src/scripts/apphub.ts'],
-//   cache: {},
-//   packageCache: {}
-// };
-//
-// function runBrowserify() {
-//   return browserify(browserifyConfig)
-//     .plugin(tsify)
-//     .transform('babelify', {
-//       presets: ['es2015'],
-//       extensions: ['ts']
-//     });
-// };
-//
-// function bundle() {
-//   return runBrowserify()
-//     .bundle()
-//     .pipe(source('bundle.js'))
-//     .pipe(buffer())
-//     .pipe(sourcemaps.init({loadMaps: true}))
-//     .pipe(uglify())
-//     .pipe(sourcemaps.write('./'))
-//     .pipe(gulp.dest('dist'));
-// };
-//
-// function bundleWatch(watch) {
-//   return watch
-//     .bundle()
-//     .pipe(source('bundle.js'))
-//     .pipe(buffer())
-//     .pipe(sourcemaps.init({loadMaps: true}))
-//     .pipe(uglify())
-//     .pipe(sourcemaps.write('./'))
-//     .pipe(gulp.dest('dist'));
-// };
-//
-// gulp.task('serve', function(cb) {
-//   const watchBrowserify = watchify(runBrowserify());
-//   bundleWatch(watchBrowserify);
-//   watchBrowserify.on('update', bundleWatch.bind(null, watchBrowserify));
-//   watchBrowserify.on('log', util.log);
-// });
-//
-// gulp.task('default', [], bundle);
-
 'use strict';
 
 const gulp = require('gulp');
@@ -64,7 +6,9 @@ const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
 const cssmin = require('gulp-cssmin');
 const importOnce = require('node-sass-import-once');
-const umd = require('umd');
+const execSync = require('child_process').execSync;
+const replace = require('gulp-replace');
+const gulpSequence = require('gulp-sequence');
 
 /**
  * TASK: SASS
@@ -90,7 +34,7 @@ gulp.task('sass:clean', function() {
 });
 
 gulp.task('sass:build', function() {
-  return gulp.src(['./src/scss/*.scss'])
+  return gulp.src(['./scss/*.scss'])
     .pipe(sass(sassOptions))
     .pipe(autoprefixer(autoprefixerOptions))
     .pipe(cssmin())
@@ -100,26 +44,29 @@ gulp.task('sass:build', function() {
 gulp.task('sass', ['sass:clean', 'sass:build']);
 
 /**
- * TASK: JS
- * Builds chrome JavaScript files into UMD modules.
+ * TASK: BUILD
+ * Run polymer build to create es5 and es6 bundles, do some path rewrites
+ * so the client loads resources from the right place.
  */
 
-gulp.task('js:clean', function() {
-  return del(['./dist/scripts/**/*']);
+gulp.task('build:polymer', function(cb) {
+  execSync('./node_modules/.bin/polymer build', {stdio: [0,1,2]});
+  cb();
 });
 
-gulp.task('js:build', function() {
-  return gulp.src(['./src/scripts/service.js'])
-    .pipe(umd({
-      templateName: 'returnExportsGlobal',
-      namespace: function(file) {
-        return 'AppHub.Service';
+gulp.task('build:fixpaths', function() {
+  return gulp.src('./build/*/views/*.handlebars', {base: './'})
+    .pipe(replace(
+      /\/(ui-hub-assets\/bower_components\/pds-chrome)\/(scripts|elements|css|bower_components)\//g,
+      function(match, $1, $2) {
+        const buildDir = /pds-chrome\/build\/([\w-]+)\/views/.exec(this.file.path)[1];
+        return `/${$1}/build/${buildDir}/${$2}/`;
       }
-    }))
-    .pipe(gulp.dest('./dist/scripts'))
+    ))
+    .pipe(gulp.dest('./'));
 });
 
-gulp.task('js', ['js:clean', 'js:build']);
+gulp.task('build', ['build:polymer', 'build:fixpaths']);
 
 /**
  * TASK: WATCH
@@ -127,5 +74,14 @@ gulp.task('js', ['js:clean', 'js:build']);
  */
 
 gulp.task('watch', ['sass'], function(cb) {
-  gulp.watch(['./src/scss/*.scss'], ['sass']);
+  gulp.watch(['./scss/*.scss'], ['sass']);
+});
+
+/**
+ * TASK: DEFAULT
+ * Build SCSS and run Polymer build tasks.
+ */
+
+gulp.task('default', function(cb) {
+  gulpSequence('sass', 'build')(cb);
 });
