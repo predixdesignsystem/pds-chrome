@@ -12,7 +12,7 @@ app.use('/ui-hub-assets/bower_components', express.static(path.resolve(__dirname
 /* Serve this project's root as /ui-hub-assets/bower_components/pds-chrome */
 app.use('/ui-hub-assets/bower_components/pds-chrome', express.static(path.resolve(__dirname, '..', '..')));
 
-const mainTemplateSource = fs.readFileSync(path.resolve(__dirname, '..', '..', 'src', 'main.handlebars'), 'utf8');
+const mainTemplateSource = fs.readFileSync(path.resolve(__dirname, '..', '..', 'views', 'main.handlebars'), 'utf8');
 const mainTemplate = Handlebars.compile(mainTemplateSource);
 const navData = require('./nav-data-two-apps');
 const templateData = (chromeless=false, body='', customThemeOptions={}) => ({

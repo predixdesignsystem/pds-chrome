@@ -1,0 +1,583 @@
+{{#if chromeless}}
+  {{!--
+    Loads the actual application, not the shell wrapper. The application
+    rendered here will be loaded inside an iFrame.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    <link rel="preconnect" href="http://dzlpbrbc7yvq0.cloudfront.net" crossorigin>
+    <link rel="preload" href="http://dzlpbrbc7yvq0.cloudfront.net/predixdev/fonts/2.0.0/GEInspiraSans.woff" as="font" type="font/woff2" crossorigin>
+    {{!-- Load favico and global theme stylesheets  --}}
+    <link async rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
+    {{!-- Load global scripts and CSS specified by app --}}
+    {{#each helpers.globalScripts}}
+      <script src="{{this}}"></script>
+    {{/each}}
+    {{#each helpers.globalCSS}}
+      <link rel="stylesheet" href="{{this}}"/>
+    {{/each}}
+    {{!-- Load global PDSChromeService helpers --}}
+    <script src="/ui-hub-assets/bower_components/pds-chrome/build/es6/scripts/pds-chrome-service.js"></script>
+    <script>
+      window.nav = PDSChromeService.compatability.wrapNavGlobal(window.parent.nav);
+      window.chromeService = PDSChromeService.fromGlobal(window.nav);
+    </script>
+  </head>
+  <body>
+    {{{body}}}
+  </body>
+  </html>
+{{else}}
+  {{!--
+    Loads a bit of "chrome" that surrounds the application iFrame, including
+    the navigation, branding bar, and notifications tray.
+  --}}
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{appname}}</title>
+    {{!-- Load newrelicHeader provided by back-end --}}
+    {{{newrelicHeader}}}
+    {{!-- Load webcomponentsjs polyfill if needed --}}
+    <script defer type="text/javascript">
+    (function() {
+      'use strict';
+      window.WebComponentsReady = false;
+      var onload = function() {
+        window.WebComponentsReady = true;
+        // For native Imports, manually fire WebComponentsReady so user code
+        // can use the same code path for native and polyfill'd imports.
+        if (!window.HTMLImports) {
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
+        }
+      };
+      var webComponentsSupported = (
+        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+      );
+      if (!webComponentsSupported) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '/ui-hub-assets/bower_components/pds-chrome/build/es6/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
+      } else {
+        onload();
+      }
+    })();
+    </script>
+    {{!-- Load Predix Design System components --}}
+    <link defer rel="import" href="/ui-hub-assets/bower_components/pds-chrome/build/es6/elements/pds-chrome-loader.html"/>
+    {{!-- Use Predix Design System light theme --}}
+    <style is="custom-style" include="px-theme-styles"></style>
+    {{!-- Set basic theme chrome styles --}}
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-size: 15px;
+      }
+      #header {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+      }
+      #app {
+        display: block;
+        position: fixed;
+        top: 6rem; /* height of px-branding-bar + px-app-nav */
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      body.theme--branding-bar-disabled #app {
+        top: 4rem; /* height of px-app-nav */
+      }
+    </style>
+  </head>
+  <body class="{{#if customThemeOptions.brandingBar.disabled}}theme--branding-bar-disabled{{/if}}">
+    <div id="header">
+      {{#unless customThemeOptions.brandingBar.disabled}}
+      <px-branding-bar id="branding-bar" application-title="{{appname}}">
+        {{#if customThemeOptions.brandingBar.hideLogo}}
+        <div slot="logo">{{!-- empty --}}</div>
+        {{/if}}
+        {{#if customThemeOptions.brandingBar.hideAttribution}}
+        <div slot="attribution">{{!-- empty --}}</div>
+        {{/if}}
+      </px-branding-bar>
+      {{/unless}}
+      <px-app-nav id="app-nav">
+        <pds-chrome-user-profile id="user-profile" slot="actions">
+        </pds-chrome-user-profile>
+      </px-app-nav>
+    </div>
+    <div id="app-container">
+      <iframe id="app"></iframe>
+    </div>
+    {{!-- Load Predix Design System chrome utilities --}}
+    <script src="/ui-hub-assets/bower_components/pds-chrome/build/es6/scripts/pds-chrome-service.js"></script>
+    <script defer>
+      (function() {
+        'use strict';
+        var navObject = {{{navStr}}};
+        window.nav = navObject;
+
+        /* Private variables to hold stateful things */
+        var mainItems = window.nav && window.nav.main && Array.isArray(window.nav.main.items) ? window.nav.main.items : [{}];
+        var profileItems = window.nav && window.nav.profile && Array.isArray(window.nav.profile.items) ? window.nav.profile.items : [];
+        var settingsItems = window.nav && window.nav.settings && Array.isArray(window.nav.settings.items) ? window.nav.settings.items : null;
+        var logoutPath = window.nav && window.nav.contextPath ? window.nav.contextPath + '/logout' : '/logout';
+
+        function initApp() {
+          initLocationListeners();
+          initAppFrame();
+          initAppNav();
+          initUserProfile();
+        };
+
+        function initAppFrame() {
+          var frame = document.getElementById('app');
+          /* Detect app navigation events */
+          frame.onload = function() {
+            console.log('%s was loaded in the iFrame', getPath(frame.contentWindow.location));
+            handleFramePathChanged(frame);
+            /* Handle location/navigation events */
+            frame.contentWindow.addEventListener('hashchange', handleFramePathChanged.bind(null, frame));
+            frame.contentWindow.addEventListener('popstate', handleFramePathChanged.bind(null, frame));
+            frame.contentWindow.document.addEventListener('click', handleFrameLinkClick.bind(null, frame));
+            frame.contentWindow.addEventListener('app-hub-location-changed', handleFrameLocationChangedRequest.bind(null, frame));
+            /* Handle requests from microapp */
+            frame.contentWindow.addEventListener('app-hub-navigation-items-changed', handleFrameNavigationChanged.bind(null, frame));
+          };
+          /* Load initial route */
+          var path = addChromelessQuery(getPath(window.location));
+          frame.src = path;
+        };
+
+        function initAppNav() {
+          var appNavElement = document.getElementById('app-nav');
+          /* Set the initial keys and items */
+          appNavElement.keys = {
+            id: 'id',
+            label: 'label',
+            children: 'items',
+            icon: 'icon'
+          };
+          appNavElement.items = mainItems;
+          /**
+           * When the user selects a new page, update the application state
+           */
+          appNavElement.addEventListener('selected-changed', function(e) {
+            if (e.detail && e.detail.value && e.detail.value.path) {
+              setPagePath(e.detail.value.path);
+            }
+          });
+          /**
+           * If there is is an initial window path select the corresponding
+           * navigation item
+           */
+          if (window.location.pathname !== "") {
+            setSelectedNavPath(getPathWithoutQuery(window.location));
+          }
+        };
+
+        function initUserProfile() {
+          var userProfileElement = document.getElementById('user-profile');
+          userProfileElement.profileLinks = profileItems;
+          userProfileElement.settingsLinks = settingsItems;
+          userProfileElement.logoutPath = logoutPath;
+          /* Set user's profile image, if available */
+          if (window.nav && window.nav.user && window.nav.user.picture) {
+            userProfileElement.imgUrl = window.nav.user.picture;
+          }
+          /* User user's firstName + lastName, fallback to name, then fallback to 'User' */
+          if (window.nav && window.nav.user && window.nav.user.firstName && window.nav.user.lastName) {
+            userProfileElement.name = window.nav.user.firstName + ' ' + window.nav.user.lastName;
+          }
+          else if (window.nav && window.nav.user && window.nav.user.name) {
+            userProfileElement.name = window.nav.user.name;
+          }
+          else {
+            userProfileElement.name = 'User';
+          }
+          /* Listen for link selections */
+          userProfileElement.addEventListener('app-hub-user-profile-link-selected', function(evt) {
+            if (evt.detail.path) {
+              if (evt.detai.path === logoutPath) {
+                // Skip straight to logging out
+                window.location.replace(linkOutcome.href, false);
+              }
+              var linkOutcome = parseTarget(evt.detail.path, window, document);
+              if (linkOutcome.sameOrigin === false) {
+                // the link target URL was on a different origin from our app,
+                // replace the shell URL with the link target URL and reload
+                window.location.replace(linkOutcome.href, false);
+              }
+              if (linkOutcome.sameOrigin === true) {
+                // the link target URL was on the same origin as our app, push to the
+                // shell history stack which will update the iframe URL
+                setPagePath(linkOutcome.href);
+              }
+            }
+          });
+        };
+
+        function initLocationListeners() {
+          window.onpopstate = function() {
+            window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed', {
+              detail: { source: 'popstate' }
+            }));
+          };
+
+          window.onhashchange = function() {
+            window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed', {
+              detail: { source: 'hashchange' }
+            }));
+          };
+
+          window.addEventListener('app-hub-shell-location-changed', function() {
+            setFramePath(addChromelessQuery(getPath(window.location)));
+            setSelectedNavPath(getPathWithoutQuery(window.location));
+          });
+        };
+
+        /**** HANDLE IFRAME EVENTS ****/
+
+        function handleFramePathChanged(frame) {
+          var newPath = stripChromelessQuery(getPath(frame.contentWindow.location));
+          setPagePath(newPath);
+        };
+
+        function handleFrameLinkClick(frame, evt) {
+          // If another event handler has stopped this event then bail out
+          if (evt.defaultPrevented) {
+            return;
+          }
+          var linkOutcome = parseLinkTarget(evt, frame.contentWindow, frame.contentWindow.document);
+          if (linkOutcome.shouldIntercept === false) {
+            return;
+          }
+          if (linkOutcome.sameOrigin === false) {
+            // the link target URL was on a different origin from our app,
+            // replace the shell URL with the link target URL and reload
+            evt.preventDefault();
+            window.location.replace(linkOutcome.href, false);
+          }
+          if (linkOutcome.sameOrigin === true) {
+            // the link target URL was on the same origin as our app, push to the
+            // shell history stack which will update the iframe URL
+            evt.preventDefault();
+            setPagePath(linkOutcome.href);
+          }
+        };
+
+        function handleFrameLocationChangedRequest(frame, evt) {
+          var path;
+          if (evt.detail && evt.detail.path) {
+            path = evt.detail.path;
+          } else {
+            path = getPath(frame.contentWindow.location);
+          }
+          setPagePath(stripChromelessQuery(path));
+        };
+
+        function handleFrameNavigationChanged(frame, evt) {
+          var appNavElement = document.getElementById('app-nav');
+          if (evt.detail && evt.detail.mainItems && Array.isArray(evt.detail.mainItems)) {
+            if (appNavElement.selected) {
+              appNavElement.select(null);
+            }
+            /* Running stringify+parse ensures a new deep clone of the items */
+            mainItems = JSON.parse(JSON.stringify(evt.detail.mainItems));
+            appNavElement.items = [{}];
+            appNavElement.items = mainItems;
+            if (window.location.pathname !== "") {
+              setSelectedNavPath(getPathWithoutQuery(window.location));
+            }
+          }
+        };
+
+        /**** UPDATE SHELL PAGE ELEMENTS ****/
+
+        function setPagePath(newPath) {
+          if (getPath(window.location) !== newPath) {
+            history.pushState(null, null, newPath);
+            window.dispatchEvent(new CustomEvent('app-hub-shell-location-changed'));
+          }
+        };
+
+        function setFramePath(newPath) {
+          var frame = document.getElementById('app');
+          if (getPath(frame.contentWindow.location) !== newPath) {
+            frame.contentWindow.location.replace(newPath, false);
+          }
+        };
+
+        function setSelectedNavPath(newPath) {
+          var appNavElement = document.getElementById('app-nav');
+          var item = PDSChromeService.util.findNavItemByPath(newPath, mainItems);
+          if (item !== null) {
+            appNavElement.select(item);
+          }
+        };
+
+        /**** SMALL URL UTILS ****/
+
+        function getPath(locationObject) {
+          return locationObject.pathname + locationObject.search + locationObject.hash;
+        };
+
+        function getPathWithoutQuery(locationObject) {
+          return locationObject.pathname +  locationObject.hash;
+        };
+
+        function addChromelessQuery(path) {
+          var uriParts = parseUri(path);
+          if (uriParts.queryKey.hasOwnProperty('chromeless') && uriParts.queryKey.chromeless === 'true') {
+            return path;
+          }
+          return uriParts.path + '?chromeless=true' + (uriParts.query.length>0 ? '&' + uriParts.query : '') + (uriParts.anchor.length>0 ? '#' + uriParts.anchor : '');
+        };
+
+        function stripChromelessQuery(path) {
+          var uriParts = parseUri(path);
+          if (uriParts.queryKey.hasOwnProperty('chromeless') && uriParts.queryKey.chromeless === 'true') {
+            var queryKeys = Object.keys(uriParts.queryKey);
+            var queryString = (queryKeys.length > 1) ? chromelessQueryToString(queryKeys, uriParts.queryKey) : '';
+            return uriParts.path + queryString + (uriParts.anchor.length>0 ? '#' + uriParts.anchor : '');
+          }
+          return path;
+        };
+
+        function chromelessQueryToString(queryKeys, queryObject) {
+          return '?' + queryKeys.reduce(function(accum, key, index, array) {
+            if (key === 'chromeless') return accum;
+            accum.push(key + '=' + queryObject[key]);
+            return accum;
+          }, []).join('&');
+        };
+
+        /**
+         * parseUri 1.2.2
+         * (c) Steven Levithan <stevenlevithan.com>
+         * MIT License
+         */
+        function parseUri (str) {
+          var	o   = parseUri.options,
+          m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+          uri = {},
+          i   = 14;
+          while (i--) uri[o.key[i]] = m[i] || "";
+          uri[o.q.name] = {};
+          uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+            if ($1) uri[o.q.name][$1] = $2;
+          });
+          return uri;
+        };
+        parseUri.options = {
+          strictMode: false,
+          key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+          q:   {
+            name:   "queryKey",
+            parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+          },
+          parser: {
+            strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+            loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+          }
+        };
+
+        /**
+         * CustomEvent polyfill
+         * Credit to https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+         */
+        (function() {
+          if (typeof window.CustomEvent === "function") return false;
+
+          function CustomEvent (event, params) {
+            params = params || { bubbles: false, cancelable: false, detail: undefined };
+            var evt = document.createEvent('CustomEvent');
+            evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+            return evt;
+           }
+
+          CustomEvent.prototype = window.Event.prototype;
+
+          window.CustomEvent = CustomEvent;
+        })();
+
+        /**
+         * iron-location URL resolution helpers
+         * SOURCE: https://github.com/PolymerElements/iron-location/blob/10493907e6ba30b2bd9d21c0f91209d08416b4e8/iron-location.html
+         * LICENSE:
+         * Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+         * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+         * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+         * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+         * Code distributed by Google as part of the polymer project is also
+         * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+         */
+        var workingURL, urlDoc, urlBase, anchor;
+        /**
+         * @param {string} path
+         * @param {string=} base
+         * @return {!URL|!HTMLAnchorElement}
+         */
+        function resolveURL(path, base) {
+          if (workingURL === undefined) {
+            workingURL = false;
+            try {
+              var u = new URL('b', 'http://a');
+              u.pathname = 'c%20d';
+              workingURL = (u.href === 'http://a/c%20d');
+              workingURL = workingURL && (new URL('http://www.google.com/?foo bar').href === 'http://www.google.com/?foo%20bar');
+            } catch (e) {}
+          }
+          if (workingURL) {
+            return new URL(path, base);
+          }
+          if (!urlDoc) {
+            urlDoc = document.implementation.createHTMLDocument('url');
+            urlBase = urlDoc.createElement('base');
+            urlDoc.head.appendChild(urlBase);
+            anchor = /** @type {HTMLAnchorElement}*/(urlDoc.createElement('a'));
+          }
+          urlBase.href = base;
+          anchor.href = path.replace(/ /g, '%20');
+          return anchor;
+        };
+        window.resolveURL = resolveURL;
+        /**
+         * Returns an object detailing how to handle the result of this link
+         * click.
+         *
+         * If `response.shouldIntercept` is true, prevent default and handle
+         * this link click manually.
+         *
+         * If `response.sameOrigin` is false, load a completely new page in
+         * the shell.
+         *
+         * If `response.sameOrigin` is true, push to the history stack and
+         * update the iframe URL.
+         *
+         * The URL to load for any case except `shouldIntercept` = false is
+         * in `response.href`.
+         *
+         * @param {MouseEvent} event
+         * @param {window} windowContext
+         * @param {document} documentContext
+         * @return {object}
+         */
+        function parseLinkTarget(event, windowContext, documentContext) {
+          // We only care about left-clicks.
+          if (event.button !== 0) {
+            return { shouldIntercept: false };
+          }
+          // We don't want modified clicks, where the intent is to open the page
+          // in a new tab.
+          if (event.metaKey || event.ctrlKey || event.shiftKey) {
+            return { shouldIntercept: false };
+          }
+          var eventPath = event.path;
+          var anchor = null;
+          for (var i = 0; i < eventPath.length; i++) {
+            var element = eventPath[i];
+            if (element.tagName === 'A' && element.href) {
+              anchor = element;
+              break;
+            }
+          }
+          // If there's no link there's nothing to do.
+          if (!anchor) {
+            return { shouldIntercept: false };
+          }
+          // Target blank is a new tab, don't intercept.
+          if (anchor.target === '_blank') {
+            return { shouldIntercept: false };
+          }
+          var href = anchor.href;
+          return parseTarget(href, windowContext, documentContext);
+        };
+        function parseTarget(href, windowContext, documentContext) {
+          var url;
+          // It only makes sense for us to intercept same-origin navigations.
+          // pushState/replaceState don't work with cross-origin links.
+          if (documentContext.baseURI != null) {
+            url = resolveURL(href, (documentContext.baseURI));
+          } else {
+            url = resolveURL(href);
+          }
+          var origin;
+          var _location = windowContext.location;
+          // IE Polyfill
+          if (_location.origin) {
+            origin = _location.origin;
+          } else {
+            origin = _location.protocol + '//' + _location.host;
+          }
+          var urlOrigin;
+          if (url.origin) {
+            urlOrigin = url.origin;
+          } else {
+            // IE always adds port number on HTTP and HTTPS on <a>.host but not on
+            // window.location.host
+            var urlHost = url.host;
+            var urlPort = url.port;
+            var urlProtocol = url.protocol;
+            var isExtraneousHTTPS = urlProtocol === 'https:' && urlPort === '443';
+            var isExtraneousHTTP = urlProtocol === 'http:' && urlPort === '80';
+            if (isExtraneousHTTPS || isExtraneousHTTP) {
+              urlHost = url.hostname;
+            }
+            urlOrigin = urlProtocol + '//' + urlHost;
+          }
+          if (urlOrigin !== origin) {
+            return {
+              shouldIntercept: true,
+              sameOrigin: false,
+              href: href
+            };
+          }
+          var normalizedHref = url.pathname + url.search + url.hash;
+          // pathname should start with '/', but may not if `new URL` is not supported
+          if (normalizedHref[0] !== '/') {
+            normalizedHref = '/' + normalizedHref;
+          }
+          // Need to use a full URL in case the containing page has a base URI.
+          var fullNormalizedHref = resolveURL(
+              normalizedHref, _location.href).href;
+          return {
+            shouldIntercept: true,
+            sameOrigin: true,
+            href: fullNormalizedHref
+          };
+        };
+
+        /**** BOOTSTRAP THE APPLICATION ****/
+
+        if (window.WebComponentsReady) {
+          initApp();
+        } else {
+          window.addEventListener('WebComponentsReady', initApp.bind(this));
+        }
+      })();
+    </script>
+  </body>
+  </html>
+{{/if}}

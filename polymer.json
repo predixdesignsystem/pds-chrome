@@ -1,0 +1,28 @@
+{
+  "entrypoint": "elements/pds-chrome-loader.html",
+  "sources": [
+    "bower.json"
+  ],
+  "extraDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.js",
+    "views/*",
+    "scripts/*",
+    "css/*"
+  ],
+  "builds": [
+    {
+      "name": "es5",
+      "preset": "es5-bundled",
+      "css": {
+        "minify": false
+      }
+    },
+    {
+      "name": "es6",
+      "preset": "es6-bundled",
+      "css": {
+        "minify": false
+      }
+    }
+  ]
+}

@@ -10,8 +10,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{{appname}}</title>
+    <link rel="preconnect" href="http://dzlpbrbc7yvq0.cloudfront.net" crossorigin>
+    <link rel="preload" href="http://dzlpbrbc7yvq0.cloudfront.net/predixdev/fonts/2.0.0/GEInspiraSans.woff" as="font" type="font/woff2" crossorigin>
     {{!-- Load favico and global theme stylesheets  --}}
-    <link rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
+    <link async rel="shortcut icon" type="image/png" href="/ui-hub-assets/bower_components/pxh-chrome/dist/favicon.ico">
     {{!-- Load global scripts and CSS specified by app --}}
     {{#each helpers.globalScripts}}
       <script src="{{this}}"></script>
@@ -20,7 +22,7 @@
       <link rel="stylesheet" href="{{this}}"/>
     {{/each}}
     {{!-- Load global PDSChromeService helpers --}}
-    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-service.js"></script>
+    <script src="/ui-hub-assets/bower_components/pds-chrome/scripts/pds-chrome-service.js"></script>
     <script>
       window.nav = PDSChromeService.compatability.wrapNavGlobal(window.parent.nav);
       window.chromeService = PDSChromeService.fromGlobal(window.nav);
@@ -65,7 +67,7 @@
       if (!webComponentsSupported) {
         var script = document.createElement('script');
         script.async = true;
-        script.src = '/ui-hub-assets/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.src = '/ui-hub-assets/bower_components/pds-chrome/bower_components/webcomponentsjs/webcomponents-lite.min.js';
         script.onload = onload;
         document.head.appendChild(script);
       } else {
@@ -73,14 +75,8 @@
       }
     })();
     </script>
-    {{!-- Load Polymer library --}}
-    <link rel="import" href="/ui-hub-assets/bower_components/polymer/polymer.html"/>
     {{!-- Load Predix Design System components --}}
-    <link rel="import" href="/ui-hub-assets/bower_components/px-app-nav/px-app-nav.html"/>
-    <link rel="import" href="/ui-hub-assets/bower_components/px-branding-bar/px-branding-bar.html"/>
-    <link rel="import" href="/ui-hub-assets/bower_components/px-theme/px-theme-styles.html"/>
-    {{!-- Load pds-chrome local components --}}
-    <link rel="import" href="/ui-hub-assets/bower_components/pds-chrome/src/elements/pds-chrome-user-profile.html"/>
+    <link defer rel="import" href="/ui-hub-assets/bower_components/pds-chrome/elements/pds-chrome-loader.html"/>
     {{!-- Use Predix Design System light theme --}}
     <style is="custom-style" include="px-theme-styles"></style>
     {{!-- Set basic theme chrome styles --}}
@@ -135,8 +131,8 @@
       <iframe id="app"></iframe>
     </div>
     {{!-- Load Predix Design System chrome utilities --}}
-    <script src="/ui-hub-assets/bower_components/pds-chrome/src/scripts/pds-chrome-service.js"></script>
-    <script>
+    <script src="/ui-hub-assets/bower_components/pds-chrome/scripts/pds-chrome-service.js"></script>
+    <script defer>
       (function() {
         'use strict';
         var navObject = {{{navStr}}};
