@@ -1,5 +1,7 @@
 # pds-chrome
 
+![pds-chrome screenshot](screenshot.png)
+
 pds-chrome is a custom theme for the Predix AppHub service. AppHub is a set of services that allow users to access different front-end microapps and back-end microservices with the same login system and a unified navigation/wrapper UI. The pds-chrome theme provides shared UI components for navigation, user profile management, and notifications that are used to create a consistent user experience across multiple microapps.
 
 Teams already using AppHub can opt-in to use the pds-chrome theme without making many changes to their existing microapps.
