@@ -3,12 +3,6 @@
   "description": "A custom theme for the Predix AppHub service built with the Predix Design System",
   "version": "1.0.0-alpha.1",
   "homepage": "https://github.com/predixdesignsystem/pds-chrome/",
-  "ignore": [
-    "*",
-    "!build/*",
-    "!views/*",
-    "!README.md"
-  ],
   "dependencies": {
     "polymer": "^1.11.0",
     "webcomponentsjs": "^0.7.0",
