@@ -6,6 +6,7 @@
   "ignore": [
     "*",
     "!build/*",
+    "!views/*",
     "!README.md"
   ],
   "dependencies": {
