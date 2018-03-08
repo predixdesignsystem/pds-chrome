@@ -1,0 +1,82 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<!-- Predix components used by this app view -->
+<link rel="import" href="../bower_components/px-card/px-card.html">
+<link rel="import" href="../bower_components/px-simple-bar-chart/px-simple-bar-chart.html">
+<link rel="import" href="../bower_components/px-key-value-pair/px-key-value-pair.html">
+<link rel="import" href="../bower_components/px-gauge/px-gauge.html">
+<link rel="import" href="../bower_components/px-card/px-card.html">
+<link rel="import" href="../bower_components/px-vis-timeseries/px-vis-timeseries.html">
+
+<!-- Load styles -->
+<link rel="import" href="../css/px-sample-app-styles.html">
+
+<dom-module id="px-sample-dashboard">
+  <template>
+    <style include="px-sample-app-styles"></style>
+
+    <!-- By placing several px-key-value-pairs in a flex container, we can easily create a "spine" which is a term
+         we use for a row of KPIs or other high level information about an asset on the top of a dashboard. -->
+
+    <div class="spine u-pt">
+      <span class="heading--page u-p">{{title}}</span>
+
+      <div class="flex flex--wrap flex--justify">
+        <px-key-value-pair class="u-p" key="Total alerts" value="21" size="beta"></px-key-value-pair>
+        <px-key-value-pair class="u-p" key="Connected devices" value="583" size="beta"></px-key-value-pair>
+        <px-key-value-pair class="u-p" key="Utilization" value="89" uom="%" size="beta"></px-key-value-pair>
+        <px-key-value-pair class="u-p" key="Faults" value="3" size="beta"></px-key-value-pair>
+        <px-key-value-pair class="u-p" key="Output" value="53" uom="MW" size="beta"></px-key-value-pair>
+      </div>
+    </div>
+
+    <!-- This first px-card contains 4 kpis with bar charts and 4 gauges -->
+
+    <px-card header-text="Productivity Details" icon="px-fea:alerts">
+      <div class="actions">
+        <px-icon icon="px-utl:app-settings"></px-icon>
+      </div>
+      <div class="flex flex--wrap flex--justify">
+        <div class="gaugeContainer u-p u-mb flex flex--col">
+          <div class="flex u-mb">
+            <px-key-value-pair key="Measured Output" value="110" uom="MW" size="delta"></px-key-value-pair>
+            <px-simple-bar-chart class="u-ml++" width="100" height="50" chart-data="[ [112,57,53,122,128,120,56] ]" colors="[&quot;#8098FF&quot;]"></px-simple-bar-chart>
+          </div>
+          <px-gauge class="gauge1" value="85" unit="%" normal="[ [0,100] ]" bar-width="20"></px-gauge>
+        </div>
+        <div class="gaugeContainer u-p u-mb flex flex--col">
+          <div class="flex u-mb">
+            <px-key-value-pair key="Measured Output" value="15" uom="MW" size="delta"></px-key-value-pair>
+            <px-simple-bar-chart class="u-ml++" width="100" height="50" chart-data="[ [53,122,128,120,56,94,102] ]" colors="[&quot;#7BA662&quot;]"></px-simple-bar-chart>
+          </div>
+          <px-gauge class="gauge2" value="10" unit="%" normal="[ [0,100] ]" bar-width="20"></px-gauge>
+        </div>
+        <div class="gaugeContainer u-p u-mb flex flex--col">
+          <div class="flex u-mb">
+            <px-key-value-pair key="Measured Output" value="121" uom="MW" size="delta"></px-key-value-pair>
+            <px-simple-bar-chart class="u-ml++" width="100" height="50" chart-data="[ [53,122,128,120,56,94,102] ]" colors="[&quot;#E081C9&quot;]"></px-simple-bar-chart>
+          </div>
+          <px-gauge class="gauge3" value="65" unit="%" normal="[ [0,100] ]" bar-width="20"></px-gauge>
+        </div>
+        <div class="gaugeContainer u-p u-mb flex flex--col">
+          <div class="flex u-mb">
+            <px-key-value-pair key="Measured Output" value="98" uom="MW" size="delta"></px-key-value-pair>
+            <px-simple-bar-chart class="u-ml++" width="100" height="50" chart-data="[ [53,122,128,120,56,94,102] ]" colors="[&quot;#E9A24B&quot;]"></px-simple-bar-chart>
+          </div>
+          <px-gauge class="gauge4" value="90" unit="%" normal="[ [0,100] ]" bar-width="20"></px-gauge>
+        </div>
+      </div>
+    </px-card>
+
+    <!-- This last px-card includes a px-vis-timeseries chart. -->
+    <px-card class="light-card" header-text="Exhaust TC Differentials" icon="px-fea:orchestration">
+      <div class="actions">
+        <px-icon icon="px-utl:app-settings"></px-icon>
+      </div>
+      <px-vis-timeseries debounce-resize-timing="250" width="700" height="300" chart-horizontal-alignment="center" chart-vertical-alignment="center" register-config="{&quot;type&quot;:&quot;horizontal&quot;}" chart-data="[[chartData]]" series-config="{&quot;y0&quot;:{&quot;name&quot;:&quot;TC01-TTXM&quot;,&quot;x&quot;:&quot;timeStamp&quot;,&quot;y&quot;:&quot;y0&quot;,&quot;yAxisUnit&quot;:&quot;C&quot;},&quot;y1&quot;:{&quot;name&quot;:&quot;TC02-TTXM&quot;,&quot;x&quot;:&quot;timeStamp&quot;,&quot;y&quot;:&quot;y1&quot;,&quot;yAxisUnit&quot;:&quot;C&quot;},&quot;y2&quot;:{&quot;name&quot;:&quot;TC03-TTXM&quot;,&quot;x&quot;:&quot;timeStamp&quot;,&quot;y&quot;:&quot;y2&quot;,&quot;yAxisUnit&quot;:&quot;C&quot;},&quot;y3&quot;:{&quot;name&quot;:&quot;TC04-TTXM&quot;,&quot;x&quot;:&quot;timeStamp&quot;,&quot;y&quot;:&quot;y3&quot;,&quot;yAxisUnit&quot;:&quot;C&quot;}}" chart-extents="{&quot;x&quot;:[&quot;dynamic&quot;,&quot;dynamic&quot;],&quot;y&quot;:[&quot;dynamic&quot;,&quot;dynamic&quot;]}" x-axis-config="{&quot;title&quot;:&quot;Date&quot;}" y-axis-config="{&quot;title&quot;:&quot;Temperature&quot;,&quot;titleTruncation&quot;:false,&quot;unit&quot;:&quot;C&quot;}">
+      </px-vis-timeseries>
+    </px-card>
+
+  </template>
+</dom-module>
+<script src="px-sample-dashboard.js"></script>

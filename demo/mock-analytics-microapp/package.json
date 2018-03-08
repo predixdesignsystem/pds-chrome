@@ -1,0 +1,15 @@
+{
+  "name": "mock-analytics-microapp",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "./bin/www"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-http-proxy": "^1.1.0",
+    "express-query-boolean": "^2.0.0",
+    "handlebars": "^4.0.11",
+    "request": "^2.83.0"
+  }
+}

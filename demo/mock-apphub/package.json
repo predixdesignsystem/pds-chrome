@@ -1,0 +1,19 @@
+{
+  "name": "mock-apphub",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "./bin/www"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-query-boolean": "^2.0.0",
+    "express-request-proxy": "^2.0.0",
+    "handlebars": "^4.0.11",
+    "http-proxy-middleware": "^0.17.4",
+    "request": "^2.83.0"
+  },
+  "engines": {
+    "node": "^9.0.0"
+  }
+}

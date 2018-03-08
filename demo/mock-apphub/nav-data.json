@@ -1,0 +1,84 @@
+{
+  "appName": "PDS Chrome Test",
+  "paths": {
+    "analytics": "/analytics",
+    "user": "/user"
+  },
+  "contextPath": "",
+  "localeData": {},
+  "main": {
+    "items": [
+      {
+        "label": "Analytics",
+        "path": "/analytics/#/",
+        "icon": "px-fea:analytics",
+        "id": "analytics.0",
+        "items": [
+          {
+            "label": "Dashboard",
+            "path": "/analytics/#/dashboard",
+            "id": "analytics.0.1"
+          },
+          {
+            "label": "Tabs",
+            "path": "/analytics/#/tabs",
+            "id": "analytics.0.0"
+          },
+          {
+            "label": "Inbox",
+            "path": "/analytics/#/inbox",
+            "id": "analytics.0.0"
+          }
+        ]
+      }
+    ]
+  },
+  "profile": {
+    "items": [
+      {
+        "label": "My Profile",
+        "path": "/user/#/",
+        "id": "user.0",
+        "items": [
+          {
+            "label": "Profile Detail1",
+            "path": "/user/#/",
+            "id": "user.0.0"
+          },
+          {
+            "label": "Your network",
+            "path": "/user/#/network",
+            "id": "user.0.1"
+          }
+        ]
+      }
+    ]
+  },
+  "settings": {
+    "items": [
+      {
+        "label": "Settings",
+        "path": "/settings/#/",
+        "id": "settings.0",
+        "items": [
+          {
+            "label": "settings global",
+            "path": "/settings/#/global",
+            "id": "settings_sub.0.0"
+          },
+          {
+            "label": "Help",
+            "path": "https://www.predix.io/resources",
+            "id": "settings_sub.0.1"
+          }
+        ]
+      }
+    ]
+  },
+  "user": {
+    "name": "user1",
+    "firstName": "Thomas",
+    "lastName": "Edison",
+    "picture": "/ui-hub-assets/bower_components/pds-chrome/test/img/profile-picture.jpg"
+  }
+}

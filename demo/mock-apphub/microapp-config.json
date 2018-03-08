@@ -1,0 +1,6 @@
+{
+  "analytics": {
+    "host": "https://pds-chrome-demo-analytics-microapp.run.aws-usw02-pr.ice.predix.io",
+    "template": "/index.html"
+  }
+}

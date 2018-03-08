@@ -1,0 +1,10 @@
+{
+  "name": "fake-apphub",
+  "private": true,
+  "dependencies": {
+    "pds-chrome": "predixdesignsystem/pds-chrome#remove-ignore"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.0"
+  }
+}

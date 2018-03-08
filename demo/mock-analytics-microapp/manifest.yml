@@ -1,0 +1,6 @@
+---
+applications:
+- name: pds-chrome-demo-analytics-microapp
+  memory: 128M
+  buildpack: nodejs_buildpack
+  command: npm start
