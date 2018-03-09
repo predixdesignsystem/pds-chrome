@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>PDS Chrome Theme Options</title>
+  <link rel="stylesheet" href="https://rawgit.com/davidrleonard/606c50e3a68f00dbf4a4732c79aa763a/raw/f5ed467c67c8a54331ab4e55ef3091c6c9fad5ed/predix-design-system.css"/>
+  <style>
+    html {
+      margin: 0;
+      padding: 1rem;
+    }
+    .config-option {
+      display: flex;
+      align-items: center;
+    }
+    .config-option span {
+      margin-left: 0.5rem;
+      margin-top: -0.1rem;
+      font-size: 1.1rem;
+    }
+    .config-option + .config-option {
+      margin-top: 0.5rem;
+    }
+    .saved {
+      color: rgb(66, 88, 14);
+      background-color: rgb(236, 255, 238);
+      padding: 1rem;
+    }
+    .saved a {
+      color: rgb(66, 88, 14);
+    }
+  </style>
+</head>
+<body>
+  {{#if saved}}
+  <div class="saved">
+    Configuration saved. <a href="/">Take it for a test drive.</a>
+  </div>
+  {{/if}}
+
+  <h1 class="heading--page">PDS Theme Demo Options</h1>
+  <form action="/@config" method="post">
+    <label for="config">Current theme config:</label>
+    <textarea name="config" id="config" cols="30" rows="10">
+{{config}}
+    </textarea>
+    <button class="btn btn--large btn--call-to-action" type="submit">Save</button>
+  </form>
+
+  <h2 class="section-header">Try these options:</h2>
+  <div class="config-option">
+    <input id="use-dark-theme" type="checkbox" class="toggle__input">
+    <label for="use-dark-theme" class="toggle__label"></label>
+    <span>Use dark theme</span>
+  </div>
+  <div class="config-option">
+    <input id="use-vertical-nav" type="checkbox" class="toggle__input">
+    <label for="use-vertical-nav" class="toggle__label"></label>
+    <span>Use vertical app nav</span>
+  </div>
+  <div class="config-option">
+    <input id="hide-branding-bar" type="checkbox" class="toggle__input">
+    <label for="hide-branding-bar" class="toggle__label"></label>
+    <span>Hide branding bar</span>
+  </div>
+
+  <script>
+    function getConfig() {
+      return JSON.parse(document.getElementById('config').value);
+    }
+
+    function setConfig(val) {
+      const sorted = {};
+      const keys = Object.keys(val);
+      keys.sort();
+      keys.forEach(key => {
+        sorted[key] = val[key];
+      });
+      const text = JSON.stringify(sorted, null, '  ');
+      document.getElementById('config').value = text;
+    }
+
+    const initial = getConfig();
+    console.log(initial);
+    if (initial.darkTheme) document.getElementById('use-dark-theme').checked = true;
+    if (initial.appNav && initial.appNav.vertical) document.getElementById('use-vertical-nav').checked = true;
+    if (initial.brandingBar && initial.brandingBar.disabled) document.getElementById('hide-branding-bar').checked = true;
+
+    document.getElementById('use-dark-theme').addEventListener('change', e => {
+      const config = getConfig();
+      if (e.target.checked) {
+        config.darkTheme = true;
+      } else {
+        delete config.darkTheme;
+      }
+      setConfig(config);
+    });
+
+    document.getElementById('use-vertical-nav').addEventListener('change', e => {
+      const config = getConfig();
+      if (e.target.checked) {
+        config.appNav = config.appNav || {};
+        config.appNav.vertical = true;
+      } else {
+        delete config.appNav.vertical;
+        if (!Object.keys(config.appNav).length) delete config.appNav;
+      }
+      setConfig(config);
+    });
+
+    document.getElementById('hide-branding-bar').addEventListener('change', e => {
+      const config = getConfig();
+      if (e.target.checked) {
+        config.brandingBar = config.brandingBar || {};
+        config.brandingBar.disabled = true;
+      } else {
+        delete config.brandingBar.disabled;
+        if (!Object.keys(config.brandingBar).length) delete config.brandingBar;
+      }
+      setConfig(config);
+    });
+
+    function checkOptions() {
+      console.log('whoa')
+    }
+  </script>
+</body>
+</html>

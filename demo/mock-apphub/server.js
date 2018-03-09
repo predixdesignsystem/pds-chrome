@@ -13,6 +13,8 @@
 const express = require('express');
 const Handlebars = require('handlebars');
 const expressQueryBoolParser = require('express-query-boolean');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
 const proxy = require('express-request-proxy');
 const request = require('request');
 const path = require('path');
@@ -24,6 +26,13 @@ const microapps = require('./microapp-config');
 
 /* Create express app */
 const app = express();
+
+/* Use the cookie parser to get/set AppHub theme configs from the user's session */
+app.use(cookieParser());
+
+/* Use the body parser to handle POST requests with new AppHub theme configs */
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 /* Decode query string 'true' and 'false' strings as booleans */
 app.use(expressQueryBoolParser());
@@ -78,6 +87,24 @@ app.get('/favicon.icon?/', (req, res) => {
   res.send('');
 })
 
+/* Serve the special @configure path to let users set their theme config */
+const configTemplatePath = path.resolve(__dirname, 'views', 'config.hbs');
+const configTemplateSource = fs.readFileSync(configTemplatePath, 'utf8');
+const configTemplate = Handlebars.compile(configTemplateSource);
+app.get('/@config', (req, res) => {
+  const config = req.cookies.apphubdemoconfig || {};
+  const html = configTemplate({
+    config: JSON.stringify(config, null, '  ').trim(),
+    saved: req.query.saved || false
+  });
+  res.send(html);
+});
+app.post('/@config', (req, res) => {
+  const config = JSON.parse(req.body.config);
+  res.cookie('apphubdemoconfig', config);
+  res.redirect('/@config?saved=true');
+});
+
 /* Fetch microapp entrypoint template to render in the iFrame */
 app.get('/:microapp/', (req, res) => {
   const sourceUrl = url.parse(req.url);
@@ -90,7 +117,13 @@ app.get('/:microapp/', (req, res) => {
     console.log(`Serving microapp path: ${req.originalUrl}`);
     const {microapp} = req.params;
     const chromeless = (req.query && req.query.chromeless === true) ? true : false;
-    const customThemeOptions = (req.query && req.query.customThemeOptions) ? req.query.customThemeOptions : {};
+    const cookieThemeOptions = req.cookies.apphubdemoconfig || {};
+    const queryThemeOptions = (req.query && req.query.customThemeOptions) ? req.query.customThemeOptions : {};
+    const customThemeOptions = Object.assign({}, cookieThemeOptions, queryThemeOptions);
+    if (Object.keys(customThemeOptions).length) {
+      console.log('Applied customThemeOptions:')
+      console.log(JSON.stringify(customThemeOptions, null, '  '));
+    }
 
     const microappUrl = `${microapps[microapp].host}/${microapps[microapp].template}`;
     fetchMicroappTemplate(microappUrl)

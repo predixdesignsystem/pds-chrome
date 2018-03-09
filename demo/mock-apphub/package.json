@@ -6,6 +6,8 @@
     "start": "./bin/www"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
     "express-query-boolean": "^2.0.0",
     "express-request-proxy": "^2.0.0",
