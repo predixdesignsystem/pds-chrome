@@ -22,7 +22,8 @@ const fs = require('fs');
 const url = require('url');
 const {URL} = url;
 const navData = require('./nav-data');
-const microapps = require('./microapp-config');
+const mockConfig = require('./mock-apphub-config');
+const microapps = mockConfig.apps.reduce((apps, a) => Object.assign({}, apps, { [a.id] : a }), {});
 
 /* Create express app */
 const app = express();
@@ -41,9 +42,21 @@ app.use(expressQueryBoolParser());
 app.use('/ui-hub-assets/bower_components', express.static(path.resolve(__dirname, 'bower_components')));
 
 /* Compile handlebars template */
-const mainTemplatePath = path.resolve(__dirname, 'bower_components', 'pds-chrome', 'build', 'es6', 'views', 'main.handlebars');
-const mainTemplateSource = fs.readFileSync(mainTemplatePath, 'utf8');
-const mainTemplate = Handlebars.compile(mainTemplateSource);
+// const mainTemplatePath = path.resolve(__dirname, 'bower_components', 'pds-chrome', 'build', 'es6', 'views', 'main.handlebars');
+// const mainTemplateSource = fs.readFileSync(mainTemplatePath, 'utf8');
+// const mainTemplate = Handlebars.compile(mainTemplateSource);
+function fetchMainTemplate(url) {
+  return new Promise((resolve, reject) => {
+    request(url, (err, resp, body) => {
+      if (err) reject(err);
+      resolve(body);
+    });
+  });
+}
+let mainTemplate;
+fetchMainTemplate(`${mockConfig.theme.baseUri}${mockConfig.theme.main}`).then(source => {
+  mainTemplate = Handlebars.compile(source);
+});
 
 /** Returns a rendered handlebars template with the options applied */
 function prepareTemplate(body='', chromeless=false, customThemeOptions={}) {
@@ -137,9 +150,21 @@ app.get('/:microapp/', (req, res) => {
   }
 });
 
+/* Proxy requests to the theme server */
+app.all('/apptheme/*', (req, res, next) => {
+  proxy({
+    url: mockConfig.theme.baseUri + '/*',
+    userAgent: req.get('user-agent')
+  })(req, res, err => {
+    console.log(err);
+    next(err);
+  });
+});
+
 /* Proxy requests to microapp subpaths */
 app.all('/:microapp/*', (req, res, next) => {
   const {microapp} = req.params;
+  // console.log(`Proxying request to ${microapp}: ${req.originalUrl}`);
   if (microapp) {
     const host = microapps[microapp].host;
     proxy({

@@ -4,7 +4,7 @@
   "version": "1.0.0-alpha.1",
   "homepage": "https://github.com/predixdesignsystem/pds-chrome/",
   "scripts": {
-    "start": "./bin/start-chrome-server",
+    "start": "./bin/www",
     "test:e2e": "./node_modules/.bin/nightwatch",
     "test:e2e-server": "./bin/start-e2e-server"
   },

@@ -1,0 +1,16 @@
+{
+  "theme": {
+    "baseUri": "http://localhost:3005",
+    "main": "/views/main.handlebars",
+    "error" : "/views/error_chromeful.handlebars"
+  },
+  "apps": [
+    {
+      "id": "analytics",
+      "///host": "https://pds-chrome-demo-analytics-microapp.run.aws-usw02-pr.ice.predix.io",
+      "host":"http://localhost:9000",
+      "path":"/analytics",
+      "template":"/index.html"
+    }
+  ]
+}

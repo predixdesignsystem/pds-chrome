@@ -22,7 +22,7 @@
       <link rel="stylesheet" href="{{this}}"/>
     {{/each}}
     {{!-- Load global PDSChromeService helpers --}}
-    <script src="/ui-hub-assets/bower_components/pds-chrome/scripts/pds-chrome-service.js"></script>
+    <script src="/apptheme/scripts/pds-chrome-service.js"></script>
     <script>
       window.nav = PDSChromeService.compatability.wrapNavGlobal(window.parent.nav);
       window.chromeService = PDSChromeService.fromGlobal(window.nav);
@@ -67,7 +67,7 @@
       if (!webComponentsSupported) {
         var script = document.createElement('script');
         script.async = true;
-        script.src = '/ui-hub-assets/bower_components/pds-chrome/bower_components/webcomponentsjs/webcomponents-lite.min.js';
+        script.src = '/apptheme/bower_components/pds-chrome/bower_components/webcomponentsjs/webcomponents-lite.min.js';
         script.onload = onload;
         document.head.appendChild(script);
       } else {
@@ -76,12 +76,22 @@
     })();
     </script>
     {{!-- Load Predix Design System components --}}
-    <link defer rel="import" href="/ui-hub-assets/bower_components/pds-chrome/elements/pds-chrome-loader.html"/>
+    <link defer rel="import" href="/apptheme/elements/pds-chrome-loader.html"/>
     {{!-- Use a Predix Design System theme --}}
     {{#if customThemeOptions.darkTheme}}
-      <style is="custom-style" include="px-dark-theme-styles"></style>
+    <style is="custom-style" include="px-dark-theme-styles"></style>
     {{else}}
-      <style is="custom-style" include="px-theme-styles"></style>
+    <style is="custom-style" include="px-theme-styles"></style>
+    {{/if}}
+    {{!-- Print custom CSS variables if any are defined --}}
+    {{#if customThemeOptions.cssVariables}}
+    <style is="custom-style">
+      html {
+      {{#each customThemeOptions.cssVariables}}
+        {{@key}}: {{this}};
+      {{/each}}
+      }
+    </style>
     {{/if}}
     {{!-- Set basic theme chrome styles --}}
     <style>
@@ -128,6 +138,9 @@
       body.theme--branding-bar-disabled #app {
         top: 4rem; /* height of px-app-nav */
       }
+      body.theme--branding-bar-disabled #app-nav-container {
+        top: 0;
+      }
 
       /************************************************************************
        * STATE: appNav.vertical
@@ -138,6 +151,9 @@
         bottom: 0;
         right: 0;
         width: calc(100% - 4rem);
+      }
+      body.theme--app-nav-vertical.theme--branding-bar-disabled #app {
+        top: 0; /* when there's no branding bar app should stick to the top */
       }
       body.theme--app-nav-vertical #app-nav-container {
         bottom: 0;
@@ -174,7 +190,7 @@
       <iframe id="app"></iframe>
     </div>
     {{!-- Load Predix Design System chrome utilities --}}
-    <script src="/ui-hub-assets/bower_components/pds-chrome/scripts/pds-chrome-service.js"></script>
+    <script src="/apptheme/scripts/pds-chrome-service.js"></script>
     <script defer>
       (function() {
         'use strict';
