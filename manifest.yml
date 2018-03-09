@@ -1,0 +1,6 @@
+---
+applications:
+- name: pds-chrome
+  memory: 128M
+  buildpack: nodejs_buildpack
+  command: npm start
