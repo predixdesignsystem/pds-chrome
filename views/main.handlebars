@@ -77,8 +77,12 @@
     </script>
     {{!-- Load Predix Design System components --}}
     <link defer rel="import" href="/ui-hub-assets/bower_components/pds-chrome/elements/pds-chrome-loader.html"/>
-    {{!-- Use Predix Design System light theme --}}
-    <style is="custom-style" include="px-theme-styles"></style>
+    {{!-- Use a Predix Design System theme --}}
+    {{#if customThemeOptions.darkTheme}}
+      <style is="custom-style" include="px-dark-theme-styles"></style>
+    {{else}}
+      <style is="custom-style" include="px-theme-styles"></style>
+    {{/if}}
     {{!-- Set basic theme chrome styles --}}
     <style>
       html, body {

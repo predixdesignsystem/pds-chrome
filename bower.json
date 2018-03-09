@@ -16,7 +16,8 @@
     "px-branding-bar": "^1.0.0",
     "px-theme": "^3.0.0",
     "px-dropdown": "^4.0.14",
-    "px-alert-message": "^1.1.0"
+    "px-alert-message": "^1.1.0",
+    "px-dark-theme": "^2.4.0"
   },
   "devDependencies": {
     "px-colors-design": "^1.0.4",
