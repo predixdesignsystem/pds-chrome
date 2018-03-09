@@ -86,13 +86,25 @@
         padding: 0;
         font-size: 15px;
       }
-      #header {
+      #branding-bar-container {
         display: block;
         position: fixed;
         top: 0;
         left: 0;
         right: 0;
+        height: 2rem;
         z-index: 999;
+      }
+      #app-nav-container {
+        display: block;
+        position: fixed;
+        top: 2rem; /* height of px-branding-bar */
+        left: 0;
+        right: 0;
+        z-index: 999;
+      }
+      #app-nav-actions {
+        margin: 1rem 0;
       }
       #app {
         display: block;
@@ -105,13 +117,36 @@
         height: 100%;
         border: none;
       }
+
+      /************************************************************************
+       * STATE: brandingBar.disabled
+       ************************************************************************/
       body.theme--branding-bar-disabled #app {
         top: 4rem; /* height of px-app-nav */
       }
+
+      /************************************************************************
+       * STATE: appNav.vertical
+       ************************************************************************/
+      body.theme--app-nav-vertical #app {
+        top: 2rem; /* height of px-branding-bar */
+        left: 4rem; /* width of vertical px-app-nav */
+        bottom: 0;
+        right: 0;
+        width: calc(100% - 4rem);
+      }
+      body.theme--app-nav-vertical #app-nav-container {
+        bottom: 0;
+      }
+      body.theme--app-nav-vertical #app-nav-actions {
+        height: 60px;
+        display: flex;
+        margin: 0 1rem;
+      }
     </style>
   </head>
-  <body class="{{#if customThemeOptions.brandingBar.disabled}}theme--branding-bar-disabled{{/if}}">
-    <div id="header">
+  <body class="{{#if customThemeOptions.brandingBar.disabled}}theme--branding-bar-disabled{{/if}} {{#if customThemeOptions.appNav.vertical}}theme--app-nav-vertical{{/if}}">
+    <div id="branding-bar-container">
       {{#unless customThemeOptions.brandingBar.disabled}}
       <px-branding-bar id="branding-bar" application-title="{{appname}}">
         {{#if customThemeOptions.brandingBar.hideLogo}}
@@ -122,9 +157,13 @@
         {{/if}}
       </px-branding-bar>
       {{/unless}}
-      <px-app-nav id="app-nav">
-        <pds-chrome-user-profile id="user-profile" slot="actions">
-        </pds-chrome-user-profile>
+    </div>
+    <div id="app-nav-container">
+      <px-app-nav id="app-nav" {{#if customThemeOptions.appNav.vertical}}vertical{{/if}}>
+        <div id="app-nav-actions" slot="actions">
+          <pds-chrome-user-profile id="user-profile">
+          </pds-chrome-user-profile>
+        </div>
       </px-app-nav>
     </div>
     <div id="app-container">
@@ -188,6 +227,25 @@
               setPagePath(e.detail.value.path);
             }
           });
+          /**
+           * When the vetical app nav opens and closes, collapse and un-collapse
+           * the profile.
+           */
+          appNavElement.addEventListener('vertical-opened-changed', function(e) {
+            console.log('vertical-opened-changed: ' + e.detail.value);
+            if (e.detail) {
+              var userProfileElement = document.getElementById('user-profile');
+              userProfileElement.collapsed = !e.detail.value;
+            }
+          });
+          /**
+           * Set profile to collapsed on load if using vertical app nav.
+           */
+          var isVertical = {{#if customThemeOptions.appNav.vertical}}true{{else}}false{{/if}};
+          if (isVertical) {
+            var userProfileElement = document.getElementById('user-profile');
+            userProfileElement.collapsed = true;
+          }
           /**
            * If there is is an initial window path select the corresponding
            * navigation item

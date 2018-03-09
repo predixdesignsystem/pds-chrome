@@ -12,6 +12,7 @@
         display: flex;
         flex: 1 1 auto;
         flex-direction: row;
+        align-items: center;
       }
       .profile__picture {
         display: block;
@@ -27,6 +28,13 @@
       .profile__name {
         line-height: 0;
         color: var(--pds-chrome-user-profile-name-color, var(--px-app-nav-item-text-color, black))
+      }
+
+      :host([collapsed]) #profileLinksDropDown {
+        display: none;
+      }
+      :host([collapsed]) #settingsLinksDropdown {
+        display: none;
       }
     </style>
     <div class="profile">
@@ -96,6 +104,12 @@
         settingsLinks: {
           type: Array,
           value: null
+        },
+        /** (Optional) Set to `true` to hide the profile name and icon */
+        collapsed: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       _convertProfileLinksToItems: function(links) {
