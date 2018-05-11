@@ -26,6 +26,7 @@ const importOnce = require('node-sass-import-once');
 const execSync = require('child_process').execSync;
 const replace = require('gulp-replace');
 const gulpSequence = require('gulp-sequence');
+const { ensureLicense } = require('ensure-px-license');
 
 /**
  * TASK: SASS
@@ -55,10 +56,22 @@ gulp.task('sass:build', function() {
     .pipe(sass(sassOptions))
     .pipe(autoprefixer(autoprefixerOptions))
     .pipe(cssmin())
+    .pipe(ensureLicense())
     .pipe(gulp.dest('./css'))
 });
 
 gulp.task('sass', ['sass:clean', 'sass:build']);
+
+/**
+ * TASK: LICENSE
+ * Automatically adds Apache-2.0 license header to all files.
+ */
+
+gulp.task('license', function() {
+  return gulp.src(['./**/*.{html,js,css,scss}', '!**/node_modules/**/*', '!**/bower_components?(-1.x)/**/*'])
+    .pipe(ensureLicense())
+    .pipe(gulp.dest('.'));
+});
 
 /**
  * TASK: BUILD
@@ -83,7 +96,9 @@ gulp.task('build:fixpaths', function() {
     .pipe(gulp.dest('./'));
 });
 
-gulp.task('build', ['build:polymer', 'build:fixpaths']);
+gulp.task('build', function(cb) {
+  gulpSequence('build:polymer', 'build:fixpaths', 'license')(cb);
+});
 
 /**
  * TASK: WATCH
@@ -100,5 +115,5 @@ gulp.task('watch', ['sass'], function(cb) {
  */
 
 gulp.task('default', function(cb) {
-  gulpSequence('sass', 'build')(cb);
+  gulpSequence('sass', 'build', 'license')(cb);
 });
